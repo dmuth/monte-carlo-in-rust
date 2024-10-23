@@ -10,6 +10,9 @@ pub struct Random {
 }
 
 
+/*
+* Our point.
+*/
 #[derive(Debug)]
 pub struct Point {
     pub x: u32,
@@ -37,11 +40,14 @@ impl Random {
     /*
     * Return a randon number in our range.
     */
-    pub fn generate(&mut self, lower: u32, upper: u32) -> u32 {
+    pub fn get(&mut self, lower: u32, upper: u32) -> u32 {
         self.rng.gen_range(lower..=upper)
     }
 
-    pub fn generate_point(&mut self, lower: u32, upper: u32) -> Point {
+    /**
+    * Return a Point with random values.
+    */
+    pub fn get_point(&mut self, lower: u32, upper: u32) -> Point {
 
         Point {
             x: self.rng.gen_range(lower..=upper),
