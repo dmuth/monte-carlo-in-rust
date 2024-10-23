@@ -2,14 +2,15 @@
 
 use monte_carlo::Random;
 
+
 #[test]
 fn test_generate_random_number() {
 
     let mut rng = Random::new(None);
 
     for _ in 0..100 {
-        let random_number = rng.generate(1, 10);
-        assert!(random_number >= 1 && random_number <= 10, 
+        let random_number = rng.generate(0, 9);
+        assert!(random_number <= 9, 
             "Random number out of range: {}", random_number);
     }
 
@@ -29,4 +30,18 @@ fn test_generate_random_number_with_seed() {
 
 }
 
+
+#[test]
+fn test_generate_random_point() {
+
+    let mut rng = Random::new(None);
+
+    for _ in 0..100 {
+        let point = rng.generate_point(0, 9);
+        assert!(
+            point.x <= 9 && point.y <= 9,
+            "Random number out of range: {:?}", point);
+    }
+
+}
 

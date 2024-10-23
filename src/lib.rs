@@ -4,4 +4,5 @@
 mod random;
 
 pub use random::Random;
+pub use random::Point;
 
