@@ -1,5 +1,5 @@
 [package]
-name = "monte-carlo"
+name = "monte_carlo"
 version = "0.1.0"
 edition = "2021"
 
