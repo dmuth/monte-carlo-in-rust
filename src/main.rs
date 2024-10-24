@@ -1,24 +1,31 @@
 
 
 // Debugging for development
-//#![cfg_attr(debug_assertions, allow(dead_code, unused_imports))]
+#![cfg_attr(debug_assertions, allow(dead_code, unused_imports))]
 
 //use log::{info, warn, error, debug, trace};
 use log::{info};
 
-//use std::thread::sleep;
-//use std::time::Duration
+use std::thread::sleep;
 use std::time::Instant;
+use std::time::Duration;
 
 use env_logger::{Builder, Env};
-
 
 mod args;
 mod random;
 use random::Random;
+mod timer;
+use timer::Timer;
+
 
 
 fn main() {
+
+    let mut timer = Timer::new();
+    println!("TEST elapsed: {:?}", timer.get_elapsed() );
+    sleep(Duration::from_millis(100));
+    println!("TEST elapsed: {:?}", timer.get_elapsed() );
 
     let start_time = Instant::now();
 
