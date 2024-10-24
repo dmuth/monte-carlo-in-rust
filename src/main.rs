@@ -1,8 +1,9 @@
 
 
 // Debugging for development
-//#![cfg_attr(debug_assertions, allow(dead_code, unused_imports))]
+#![cfg_attr(debug_assertions, allow(dead_code, unused_imports))]
 
+mod args;
 mod random;
 use random::Random;
 
@@ -10,6 +11,9 @@ use random::Random;
 fn main() {
 
     let mut rng = Random::new(None);
+
+    let args = args::parse();
+    println!("Args: {:?}", args);
 
     println!("Random number between 1 and 10: {:?}", rng.get(1, 10) );
     let point = rng.get_point(0, 10);
