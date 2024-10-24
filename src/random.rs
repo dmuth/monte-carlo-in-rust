@@ -15,8 +15,8 @@ pub struct Random {
 */
 #[derive(Debug)]
 pub struct Point {
-    pub x: u32,
-    pub y: u32
+    pub x: u64,
+    pub y: u64
 }
 
 
@@ -40,14 +40,14 @@ impl Random {
     /*
     * Return a randon number in our range.
     */
-    pub fn get(&mut self, lower: u32, upper: u32) -> u32 {
+    pub fn get(&mut self, lower: u64, upper: u64) -> u64 {
         self.rng.gen_range(lower..=upper)
     }
 
     /**
     * Return a Point with random values.
     */
-    pub fn get_point(&mut self, lower: u32, upper: u32) -> Point {
+    pub fn get_point(&mut self, lower: u64, upper: u64) -> Point {
 
         Point {
             x: self.rng.gen_range(lower..=upper),

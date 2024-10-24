@@ -22,11 +22,11 @@ fn test_get_random_number_with_seed() {
     let mut rng = Random::new(Some(12345));
 
     let random_number = rng.get(1, 10);
-    assert_eq!(random_number, 6);
-    let random_number = rng.get(1, 10);
     assert_eq!(random_number, 4);
     let random_number = rng.get(1, 10);
-    assert_eq!(random_number, 10);
+    assert_eq!(random_number, 6);
+    let random_number = rng.get(1, 10);
+    assert_eq!(random_number, 5);
 
 }
 
@@ -52,11 +52,11 @@ fn test_get_random_point_with_seed() {
     let mut rng = Random::new(Some(12345));
 
     let point = rng.get_point(0, 9);
-    assert_eq!(point.x, 5);
-    assert_eq!(point.y, 3);
+    assert_eq!(point.x, 3);
+    assert_eq!(point.y, 5);
 
     let point = rng.get_point(0, 9);
-    assert_eq!(point.x, 9);
+    assert_eq!(point.x, 4);
     assert_eq!(point.y, 6);
 
 }
