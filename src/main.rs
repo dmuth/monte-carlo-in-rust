@@ -1,7 +1,7 @@
 
 
 // Debugging for development
-#![cfg_attr(debug_assertions, allow(dead_code, unused_imports))]
+//#![cfg_attr(debug_assertions, allow(dead_code, unused_imports))]
 
 //use log::{info, warn, error, debug, trace};
 use log::{info};
@@ -23,9 +23,9 @@ use timer::Timer;
 fn main() {
 
     let mut timer = Timer::new();
-    println!("TEST elapsed: {:?}", timer.get_elapsed() );
+    println!("TEST elapsed: {:?}, {:?}", timer.get_elapsed(), timer.get_elapsed_time_t().unwrap() );
     sleep(Duration::from_millis(100));
-    println!("TEST elapsed: {:?}", timer.get_elapsed() );
+    println!("TEST elapsed: {:?}, {:?}", timer.get_elapsed(), timer.get_elapsed_time_t().unwrap() );
 
     let start_time = Instant::now();
 
