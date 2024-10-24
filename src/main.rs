@@ -3,7 +3,8 @@
 // Debugging for development
 //#![cfg_attr(debug_assertions, allow(dead_code, unused_imports))]
 
-use monte_carlo::Random;
+mod random;
+use random::Random;
 
 
 fn main() {
