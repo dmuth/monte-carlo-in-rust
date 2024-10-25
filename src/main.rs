@@ -14,11 +14,12 @@ use env_logger::{Builder, Env};
 
 mod args;
 mod grid;
-use grid::Grid;
 mod points;
 mod random;
-use random::Random;
 mod timer;
+
+use grid::Grid;
+use random::Random;
 use timer::Timer;
 
 
