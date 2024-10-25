@@ -1,7 +1,7 @@
 
 
 // Debugging for development
-//#![cfg_attr(debug_assertions, allow(dead_code, unused_imports))]
+#![cfg_attr(debug_assertions, allow(dead_code, unused_imports))]
 
 //use log::{info, warn, error, debug, trace};
 use log::{info};
@@ -13,6 +13,9 @@ use std::time::Duration;
 use env_logger::{Builder, Env};
 
 mod args;
+mod grid;
+use grid::Grid;
+mod points;
 mod random;
 use random::Random;
 mod timer;
@@ -45,6 +48,10 @@ fn main() {
     println!("Random point: {}, {}", point.x, point.y );
 
     info!("Time elapsed: {:?}", start_time.elapsed());
+
+    let grid = Grid::new(10);
+    println!("GRID: {:?}", grid);
+
 
     println!("Hello, world!");
 

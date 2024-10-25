@@ -2,21 +2,14 @@
 use rand::{Rng, SeedableRng};
 use rand::rngs::{StdRng};
 
+use crate::points::Point;
+
+
 /*
 * Our structure which holds the rng
 */
 pub struct Random {
     rng: Box<dyn rand::RngCore>,
-}
-
-
-/*
-* Our point.
-*/
-#[derive(Debug)]
-pub struct Point {
-    pub x: u64,
-    pub y: u64
 }
 
 
