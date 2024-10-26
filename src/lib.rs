@@ -11,5 +11,5 @@ pub use random::Random;
 // Declare the points module here so that other files in this crate can use it.
 //
 mod points;
-pub use points::Point;
+pub use points::{Points,Point};
 

@@ -40,11 +40,11 @@ impl Random {
     /**
     * Return a Point with random values.
     */
-    pub fn get_point(&mut self, lower: u64, upper: u64) -> Point {
+    pub fn get_point(&mut self, size: u64) -> Point {
 
         Point {
-            x: self.rng.gen_range(lower..=upper),
-            y: self.rng.gen_range(lower..=upper),
+            x: self.rng.gen_range(0..=size),
+            y: self.rng.gen_range(0..=size),
         }
 
     }

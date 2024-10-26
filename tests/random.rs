@@ -37,7 +37,7 @@ fn test_get_random_point() {
     let mut rng = Random::new(None);
 
     for _ in 0..100 {
-        let point = rng.get_point(0, 9);
+        let point = rng.get_point(9);
         assert!(
             point.x <= 9 && point.y <= 9,
             "Random number out of range: {:?}", point);
@@ -51,11 +51,11 @@ fn test_get_random_point_with_seed() {
 
     let mut rng = Random::new(Some(12345));
 
-    let point = rng.get_point(0, 9);
+    let point = rng.get_point(9);
     assert_eq!(point.x, 3);
     assert_eq!(point.y, 5);
 
-    let point = rng.get_point(0, 9);
+    let point = rng.get_point(9);
     assert_eq!(point.x, 4);
     assert_eq!(point.y, 6);
 

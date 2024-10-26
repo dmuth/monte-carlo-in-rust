@@ -1,7 +1,7 @@
 
 
 // Debugging for development
-#![cfg_attr(debug_assertions, allow(dead_code, unused_imports))]
+#![cfg_attr(debug_assertions, allow(dead_code, unused_imports, unused_variables))]
 
 //use log::{info, warn, error, debug, trace};
 use log::{info};
@@ -19,6 +19,7 @@ mod random;
 mod timer;
 
 use grid::Grid;
+use points::{Points};
 use random::Random;
 use timer::Timer;
 
@@ -44,8 +45,12 @@ fn main() {
 
     let mut rng = Random::new(None);
 
+    let points = Points::new(&mut rng, 10, 10);
+    println!("TEST POINTS: {:?}", points);
+
+
     println!("Random number between 1 and 10: {:?}", rng.get(1, 10) );
-    let point = rng.get_point(0, 10);
+    let point = rng.get_point(10);
     println!("Random point: {}, {}", point.x, point.y );
 
     info!("Time elapsed: {:?}", start_time.elapsed());
