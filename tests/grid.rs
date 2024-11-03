@@ -16,13 +16,26 @@ fn test_grid() {
     grid.update_num_points_not_in_circle(456);
     assert_eq!(grid.get_num_points_not_in_circle(), 456);
 
-/*
-
-Calculate value of Pi
-calculate_pi()
-- get total points, get ratio of points in circle to total points, multiply by 4
-*/
-
 }
 
+#[test]
+fn test_grid_pi() {
+
+    let mut grid = Grid::new(10);
+
+    grid.update_num_points_in_circle(75);
+    grid.update_num_points_not_in_circle(25);
+
+    let pi = grid.calculate_pi();
+    assert_eq!(pi, Ok(3.0) );
+
+    let grid = Grid::new(10);
+
+    let pi = grid.calculate_pi();
+    assert!(pi.is_err() );
+    if let Err(e) = pi {
+        assert_eq!(e, "Attempted to divide by zero!");
+    }
+
+}
 

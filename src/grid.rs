@@ -41,6 +41,25 @@ impl Grid {
         self.num_points_not_in_circle += num;
     }
 
+
+    /*
+    * Calculate Pi based on our existing values.
+    */
+    pub fn calculate_pi(self) -> Result<f64, &'static str> {
+
+        let total = self.num_points_in_circle + self.num_points_not_in_circle;
+
+        if total == 0 {
+            return Err("Attempted to divide by zero!");
+        }
+
+        let quarter = self.num_points_in_circle as f64 / total as f64;
+        let retval = quarter * 4.0;
+        //println!("DEBUGGING: {}, {}, {}", total, quarter, retval);
+        Ok(retval)
+
+    }
+
 }
 
 
