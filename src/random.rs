@@ -2,7 +2,7 @@
 use rand::{Rng, SeedableRng};
 use rand::rngs::{StdRng};
 
-use crate::points::Point;
+use crate::point::Point;
 
 
 /*

@@ -14,6 +14,7 @@ use env_logger::{Builder, Env};
 
 mod args;
 mod grid;
+mod point;
 mod points;
 mod random;
 mod timer;

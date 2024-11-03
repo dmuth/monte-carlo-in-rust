@@ -8,10 +8,12 @@ mod random;
 pub use random::Random;
 
 //
-// Declare the points module here so that other files in this crate can use it.
+// Declare the points modules here so that other files in this crate can use them.
 //
+mod point;
+pub use point::Point;
 mod points;
-pub use points::{Points,Point};
+pub use points::Points;
 
 //
 // Declare our Grid module
