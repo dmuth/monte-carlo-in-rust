@@ -13,3 +13,9 @@ pub use random::Random;
 mod points;
 pub use points::{Points,Point};
 
+//
+// Declare our Grid module
+//
+mod grid;
+pub use grid::Grid;
+

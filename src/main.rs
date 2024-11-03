@@ -58,7 +58,6 @@ fn main() {
     let grid = Grid::new(10);
     println!("GRID: {:?}", grid);
 
-
     println!("Hello, world!");
 
 } // End of main()
