@@ -11,6 +11,11 @@ use crate::random::Random;
 use crate::point::Point;
 
 
+pub enum CircleMode {
+    Turbo
+}
+
+
 /*
 * A collection of points
 */
@@ -19,6 +24,7 @@ pub struct Points {
     num_points: u64,
     points: Vec<Point>,
 }
+
 
 impl Points {
 
@@ -49,6 +55,48 @@ impl Points {
     */
     pub fn get_points(self: Points) -> Vec<Point> {
         self.points
+    }
+
+
+    /*
+    * Count the number of points in a circle.
+    */
+    pub fn get_points_in_circle(self: Points, mode:Option<CircleMode>) -> u64 {
+
+        let mut retval = 0;
+        let turbo: bool;
+
+        match mode {
+            Some(CircleMode::Turbo) => { turbo = true; }
+            None => { turbo = false; }
+        }
+
+        println!("TEST TURBO: {:?}", turbo);
+
+        for point in self.points {
+
+            if turbo {
+                let total = point.x + point.y;
+                if total <= self.num_points {
+                    retval +=1;
+                } else {
+                    if point.is_in_circle(self.num_points) {
+                        retval += 1;
+                    }
+                }
+
+            } else {
+
+                if point.is_in_circle(self.num_points) {
+                    retval += 1;
+                }
+
+            }
+
+        }
+
+        retval
+
     }
 
 }

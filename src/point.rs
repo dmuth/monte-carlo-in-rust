@@ -6,7 +6,7 @@
 /*
 * Our point.
 */
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub struct Point {
     pub x: u64,
     pub y: u64

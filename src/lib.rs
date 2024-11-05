@@ -14,6 +14,7 @@ mod point;
 pub use point::Point;
 mod points;
 pub use points::Points;
+pub use points::CircleMode;
 
 //
 // Declare our Grid module
