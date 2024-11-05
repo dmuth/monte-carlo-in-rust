@@ -25,6 +25,7 @@ pub enum CircleMode {
 pub struct Points {
     num_points: u64,
     points: Vec<Point>,
+    size: u64,
 }
 
 
@@ -48,6 +49,7 @@ impl Points {
         Points {
             num_points: num_points,
             points: points,
+            size: size,
         }
 
     }
@@ -88,7 +90,7 @@ impl Points {
                 // that point is definitely inside the circle.
                 //
                 let total = point.x + point.y;
-                if total <= points.num_points {
+                if total <= points.size {
                     retval +=1;
                 } else {
                     if point.is_in_circle(points.num_points) {
