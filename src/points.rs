@@ -61,9 +61,9 @@ impl Points {
 
 
     /*
-    * Count the number of points in a circle.
+    * Our core function to get the number of points inside our circle.
     */
-    pub fn get_points_in_circle(self: Points, mode:Option<CircleMode>) -> u64 {
+    fn _get_points_in_circle(points: Points, mode:Option<CircleMode>) -> u64 {
 
         let mut retval = 0;
         let turbo: bool;
@@ -76,21 +76,29 @@ impl Points {
             None => { turbo = false; }
         }
 
-        for point in self.points {
+        for point in points.points {
 
             if turbo {
+                //
+                // If we're in turbo mode, any point where the sum and x and y 
+                // is less than the size (which is also the radius), 
+                // we know we're inside the circle and can skip the Pythagorean theorem.
+                //
+                // For example, if the size/radius is 10, and x and y are both 5, 
+                // that point is definitely inside the circle.
+                //
                 let total = point.x + point.y;
-                if total <= self.num_points {
+                if total <= points.num_points {
                     retval +=1;
                 } else {
-                    if point.is_in_circle(self.num_points) {
+                    if point.is_in_circle(points.num_points) {
                         retval += 1;
                     }
                 }
 
             } else {
 
-                if point.is_in_circle(self.num_points) {
+                if point.is_in_circle(points.num_points) {
                     retval += 1;
                 }
 
@@ -100,7 +108,20 @@ impl Points {
 
         retval
 
+    } // End of _get_points_in_circle()
+
+
+    /*
+    * Count the number of points in a circle.
+    */
+    pub fn get_points_in_circle(self: Points) -> u64 {
+        Self::_get_points_in_circle(self, None)
     }
+
+    pub fn get_points_in_circle_turbo(self: Points) -> u64 {
+        Self::_get_points_in_circle(self, Some(CircleMode::Turbo))
+    }   
+
 
 }
 

@@ -2,7 +2,6 @@
 
 use monte_carlo::Random;
 use monte_carlo::Points;
-use monte_carlo::CircleMode;
 
 
 #[test]
@@ -50,8 +49,7 @@ fn test_calculate_points_in_circle_with_seed() {
 
     let points = Points::new(&mut rng, size, num_points);
 
-// TODO: Rewrite internals to use a core function and wrapper functions
-    let num_points = points.get_points_in_circle(None);
+    let num_points = points.get_points_in_circle();
     assert_eq!(num_points, 9);
 
 }
@@ -65,7 +63,7 @@ fn test_calculate_points_in_circle_turbo_with_seed() {
 
     let points = Points::new(&mut rng, size, num_points);
 
-    let num_points = points.get_points_in_circle(Some(CircleMode::Turbo));
+    let num_points = points.get_points_in_circle_turbo();
     assert_eq!(num_points, 9);
 
 }
