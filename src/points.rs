@@ -10,6 +10,8 @@
 use crate::random::Random;
 use crate::point::Point;
 
+use log::{info};
+
 
 pub enum CircleMode {
     Turbo
@@ -67,11 +69,12 @@ impl Points {
         let turbo: bool;
 
         match mode {
-            Some(CircleMode::Turbo) => { turbo = true; }
+            Some(CircleMode::Turbo) => { 
+                info!("Setting turbo mode for circle analysis!");
+                turbo = true; 
+            }
             None => { turbo = false; }
         }
-
-        println!("TEST TURBO: {:?}", turbo);
 
         for point in self.points {
 
