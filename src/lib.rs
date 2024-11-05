@@ -22,3 +22,6 @@ pub use points::CircleMode;
 mod grid;
 pub use grid::Grid;
 
+mod app;
+pub use app::App;
+
