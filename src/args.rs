@@ -12,7 +12,7 @@ use num_cpus;
 pub struct Args {
 
     #[arg(short, long, default_value_t = 10, help = "The Size of the grid.")]
-    size: u32,
+    grid_size: u32,
 
     #[arg(short, long, default_value_t = 100, help = "How many random numbers do we want to generate in total?")]
     count: u32,
@@ -34,7 +34,7 @@ pub fn parse() -> Args {
 
     let args = Args::parse();
 
-    if args.size < 10 {
+    if args.grid_size < 10 {
         panic!("Size must be at least 10!");
     }
 

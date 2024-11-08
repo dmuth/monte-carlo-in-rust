@@ -14,7 +14,7 @@ use crate::points::Points;
 */
 pub struct App<'a> {
     rng: &'a mut Random,
-    size: u64, // Size of each dimension in the grid.
+    grid_size: u64, // Size of each dimension in the grid.
     num_points: u64,
     num_points_left: u64,
     num_threads: u64,
@@ -30,7 +30,7 @@ impl fmt::Debug for App<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("App")
             .field("random", &"<Random>") // Custom format for `Random`
-            .field("size", &self.size)
+            .field("grid_size", &self.grid_size)
             .field("num_points", &self.num_points)
             .field("num_points_left", &self.num_points_left)
             .field("num_threads", &self.num_threads)
@@ -43,12 +43,12 @@ impl fmt::Debug for App<'_> {
 
 impl<'a> App<'a> {
 
-    pub fn new(rng: &'a mut Random, size: u64, num_points: u64, 
+    pub fn new(rng: &'a mut Random, grid_size: u64, num_points: u64, 
         num_threads: u64, batch_size: u64, turbo: bool) -> Self {
 
         App {
             rng: rng,
-            size: size,
+            grid_size: grid_size,
             num_points: num_points,
             num_points_left: num_points,
             num_threads: num_threads,
@@ -69,7 +69,7 @@ impl<'a> App<'a> {
             panic!("Thead count > 1 currently not supported!");
         }
      
-        let mut grid = Grid::new(self.size);
+        let mut grid = Grid::new(self.grid_size);
 
 
         loop {
@@ -79,7 +79,7 @@ impl<'a> App<'a> {
                 break
             }
 
-            let points = Points::new(self.rng, self.size, num_points);
+            let points = Points::new(self.rng, self.grid_size, num_points);
 
             let points_in_circle;
             if ! self.turbo {

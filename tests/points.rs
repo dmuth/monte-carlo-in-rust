@@ -8,10 +8,10 @@ use monte_carlo::Points;
 fn test_get_random_points() {
 
     let mut rng = Random::new(None);
-    let size = 10;
+    let grid_size = 10;
     let num_points = 10;
 
-    let points = Points::new(&mut rng, size, num_points);
+    let points = Points::new(&mut rng, grid_size, num_points);
 
     let points = points.get_points();
 
@@ -28,10 +28,10 @@ fn test_get_random_points() {
 fn test_get_random_points_with_seed() {
 
     let mut rng = Random::new(Some(12345));
-    let size = 10;
+    let grid_size = 10;
     let num_points = 10;
 
-    let points = Points::new(&mut rng, size, num_points);
+    let points = Points::new(&mut rng, grid_size, num_points);
 
     let points = points.get_points();
 
@@ -44,10 +44,10 @@ fn test_get_random_points_with_seed() {
 fn test_calculate_points_in_circle_with_seed() {
 
     let mut rng = Random::new(Some(12345));
-    let size = 10;
+    let grid_size = 10;
     let num_points = 10;
 
-    let points = Points::new(&mut rng, size, num_points);
+    let points = Points::new(&mut rng, grid_size, num_points);
 
     let num_points = points.get_points_in_circle();
     assert_eq!(num_points, 9);
@@ -58,10 +58,10 @@ fn test_calculate_points_in_circle_with_seed() {
 fn test_calculate_points_in_circle_turbo_with_seed() {
 
     let mut rng = Random::new(Some(12345));
-    let size = 10;
+    let grid_size = 10;
     let num_points = 10;
 
-    let points = Points::new(&mut rng, size, num_points);
+    let points = Points::new(&mut rng, grid_size, num_points);
 
     let num_points = points.get_points_in_circle_turbo();
     assert_eq!(num_points, 9);

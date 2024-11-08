@@ -25,7 +25,7 @@ pub enum CircleMode {
 pub struct Points {
     num_points: u64,
     points: Vec<Point>,
-    size: u64,
+    grid_size: u64,
 }
 
 
@@ -35,21 +35,21 @@ impl Points {
     * Function to generate a series of points and put them into the structure.
     * 
     * rng - Our random number generator.
-    * size - How big is the square we're plotting points in?
+    * grid_size - How big is the square we're plotting points in?
     * num_points - How many points to plot in the square?
     */
-    pub fn new(rng: &mut Random, size: u64, num_points: u64) -> Self {
+    pub fn new(rng: &mut Random, grid_size: u64, num_points: u64) -> Self {
 
         let mut points = Vec::<Point>::new();
 
         for _i in 0..num_points {
-            points.push(rng.get_point(size));
+            points.push(rng.get_point(grid_size));
         }
 
         Points {
             num_points: num_points,
             points: points,
-            size: size,
+            grid_size: grid_size,
         }
 
     }
@@ -90,17 +90,17 @@ impl Points {
                 // that point is definitely inside the circle.
                 //
                 let total = point.x + point.y;
-                if total <= points.size {
+                if total <= points.grid_size {
                     retval +=1;
                 } else {
-                    if point.is_in_circle(points.size) {
+                    if point.is_in_circle(points.grid_size) {
                         retval += 1;
                     }
                 }
 
             } else {
 
-                if point.is_in_circle(points.size) {
+                if point.is_in_circle(points.grid_size) {
                     retval += 1;
                 }
 
