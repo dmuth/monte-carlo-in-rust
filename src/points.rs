@@ -93,14 +93,14 @@ impl Points {
                 if total <= points.size {
                     retval +=1;
                 } else {
-                    if point.is_in_circle(points.num_points) {
+                    if point.is_in_circle(points.size) {
                         retval += 1;
                     }
                 }
 
             } else {
 
-                if point.is_in_circle(points.num_points) {
+                if point.is_in_circle(points.size) {
                     retval += 1;
                 }
 

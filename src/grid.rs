@@ -9,7 +9,7 @@
 #[derive(Debug)]
 pub struct Grid {
     // The size of each side, in points.
-    size: u32,
+    size: u64,
     num_points_in_circle: u64,
     num_points_not_in_circle: u64,
 }
@@ -17,7 +17,7 @@ pub struct Grid {
 
 impl Grid {
 
-    pub fn new(size: u32) -> Self {
+    pub fn new(size: u64) -> Self {
         Grid {
             size: size,
             num_points_in_circle: 0,

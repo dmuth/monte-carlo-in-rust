@@ -10,13 +10,29 @@ fn test_app() {
     let mut rng = Random::new(Some(12345));
 
     let size = 10;
-    let num_points = 1000;
+    let num_points = 10000;
     let num_threads = 1;
-    let batch_count = 100;
+    let batch_count = 1000;
     let app = App::new(&mut rng, size, num_points, num_threads, batch_count, false);
 
-    let tmp = app.go();
-    println!("TEST: {:?}", tmp);
+    let pi = app.go();
+    assert_eq!(pi, 2.9784);
+
+}
+
+#[test]
+fn test_app_turbo() {
+
+    let mut rng = Random::new(Some(12345));
+
+    let size = 10;
+    let num_points = 10000;
+    let num_threads = 1;
+    let batch_count = 1000;
+    let app = App::new(&mut rng, size, num_points, num_threads, batch_count, true);
+
+    let pi = app.go();
+    assert_eq!(pi, 2.9784);
 
 }
 
