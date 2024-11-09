@@ -26,7 +26,7 @@ fn test_app_turbo() {
     let num_threads = 1;
     let batch_size = 1000;
     let random_seed = Some(12345);
-    let app = App::new(grid_size, num_points, num_threads, batch_size, false, random_seed);
+    let app = App::new(grid_size, num_points, num_threads, batch_size, true, random_seed);
 
     let pi = app.go();
     assert_eq!(pi, 2.908);
