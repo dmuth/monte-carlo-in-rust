@@ -23,7 +23,6 @@ pub enum CircleMode {
 */
 #[derive(Debug)]
 pub struct Points {
-    num_points: u64,
     points: Vec<Point>,
     grid_size: u64,
 }
@@ -47,12 +46,26 @@ impl Points {
         }
 
         Points {
-            num_points: num_points,
             points: points,
             grid_size: grid_size,
         }
 
     }
+
+
+    /*
+    * This version of the constructor is used when we want to manually insert
+    * pre-generated points for testing purposes.
+    */
+    pub fn new_with_points(grid_size: u64, points: Vec::<Point>) -> Self {
+
+        Points {
+            points: points,
+            grid_size: grid_size,
+        }
+
+    }
+
 
     /*
     * Return our points for diagnostic purposes.
@@ -65,7 +78,7 @@ impl Points {
     /*
     * Our core function to get the number of points inside our circle.
     */
-    fn _get_points_in_circle(points: Points, mode:Option<CircleMode>) -> u64 {
+    pub fn _get_points_in_circle(self: Points, mode:Option<CircleMode>) -> u64 {
 
         let mut retval = 0;
         let turbo: bool;
@@ -78,7 +91,7 @@ impl Points {
             None => { turbo = false; }
         }
 
-        for point in points.points {
+        for point in self.points {
 
             if turbo {
                 //
@@ -90,17 +103,17 @@ impl Points {
                 // that point is definitely inside the circle.
                 //
                 let total = point.x + point.y;
-                if total <= points.grid_size {
+                if total <= self.grid_size {
                     retval +=1;
                 } else {
-                    if point.is_in_circle(points.grid_size) {
+                    if point.is_in_circle(self.grid_size) {
                         retval += 1;
                     }
                 }
 
             } else {
 
-                if point.is_in_circle(points.grid_size) {
+                if point.is_in_circle(self.grid_size) {
                     retval += 1;
                 }
 
@@ -117,11 +130,11 @@ impl Points {
     * Count the number of points in a circle.
     */
     pub fn get_points_in_circle(self: Points) -> u64 {
-        Self::_get_points_in_circle(self, None)
+        self._get_points_in_circle(None)
     }
 
     pub fn get_points_in_circle_turbo(self: Points) -> u64 {
-        Self::_get_points_in_circle(self, Some(CircleMode::Turbo))
+        self._get_points_in_circle(Some(CircleMode::Turbo))
     }   
 
 

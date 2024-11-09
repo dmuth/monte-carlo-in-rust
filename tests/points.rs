@@ -1,7 +1,9 @@
 
 
 use monte_carlo::Random;
+use monte_carlo::Point;
 use monte_carlo::Points;
+use monte_carlo::CircleMode;
 
 
 #[test]
@@ -67,5 +69,44 @@ fn test_calculate_points_in_circle_turbo_with_seed() {
     assert_eq!(num_points, 9);
 
 }
+
+#[test]
+fn test_calculate_points_in_circle_manually() {
+
+    let helper = |x: u64, y:u64 | -> Points {
+
+        let mut points = Vec::<Point>::new();
+        let point = Point{x:x, y:y};
+        points.push(point);
+
+        return Points::new_with_points(10, points);
+
+    };
+
+    let points = helper(1,1);
+    assert_eq!(1, points._get_points_in_circle(None));
+
+    let points = helper(5, 5);
+    assert_eq!(1, points._get_points_in_circle(None));
+
+    let points = helper(0, 0);
+    assert_eq!(1, points._get_points_in_circle(None));
+
+    let points = helper(0, 10);
+    assert_eq!(1, points._get_points_in_circle(None));
+
+    let points = helper(10, 0);
+    assert_eq!(1, points._get_points_in_circle(None));
+
+    let points = helper(10, 0);
+    assert_eq!(1, points._get_points_in_circle(Some(CircleMode::Turbo)));
+
+    let points = helper(10, 1);
+    assert_eq!(0, points._get_points_in_circle(None));
+
+    let points = helper(1, 10);
+    assert_eq!(0, points._get_points_in_circle(None));
+
+} 
 
 
