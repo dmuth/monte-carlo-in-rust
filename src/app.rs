@@ -3,10 +3,13 @@
 //#![cfg_attr(debug_assertions, allow(dead_code, unused_imports, unused_variables))]
 
 use std::fmt;
+use std::sync::Arc;
+use std::thread;
 
 use crate::random::Random;
 use crate::grid::Grid;
 use crate::points::Points;
+
 
 
 /*
@@ -21,6 +24,7 @@ pub struct App<'a> {
     batch_size: u64,
     turbo: bool,
 }
+
 
 /*
 * Our custom formatted since we can't print out the random value.
@@ -41,6 +45,7 @@ impl fmt::Debug for App<'_> {
 
 }
 
+
 impl<'a> App<'a> {
 
     pub fn new(rng: &'a mut Random, grid_size: u64, num_points: u64, 
@@ -60,17 +65,11 @@ impl<'a> App<'a> {
 
 
     /*
-    * Our main entry point.  
-    * Does all the work and returns the value of Pi.
+    * Run things in a single thread.
     */
-    pub fn go(mut self: App<'a>) -> f64 {
+    fn go_single_thread(&mut self) -> f64 {
 
-        if self.num_threads > 1 {
-            panic!("Thead count > 1 currently not supported!");
-        }
-     
         let mut grid = Grid::new(self.grid_size);
-
 
         loop {
 
@@ -97,6 +96,25 @@ impl<'a> App<'a> {
 
         let pi = grid.calculate_pi().unwrap();
 
+        pi
+
+    } // End of go_single_thread()
+
+
+    /*
+    * Our main entry point.  
+    * Does all the work and returns the value of Pi.
+    */
+    pub fn go(mut self: App<'a>) -> f64 {
+
+        let pi;
+        if self.num_threads > 1 {
+            panic!("Thead count > 1 currently not supported!");
+
+        } else {
+            pi = self.go_single_thread();
+        }
+    
         pi
 
     } // End of go()
