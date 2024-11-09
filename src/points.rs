@@ -82,33 +82,24 @@ impl Points {
 
         let mut retval = 0;
         let turbo: bool;
+        let r_squared = self.grid_size.pow(2);
 
         match mode {
             Some(CircleMode::Turbo) => { 
                 info!("Setting turbo mode for circle analysis!");
                 turbo = true; 
             }
-            None => { turbo = false; }
+            None => { 
+                turbo = false; 
+            }
         }
 
         for point in self.points {
 
             if turbo {
-                //
-                // If we're in turbo mode, any point where the sum and x and y 
-                // is less than the size (which is also the radius), 
-                // we know we're inside the circle and can skip the Pythagorean theorem.
-                //
-                // For example, if the size/radius is 10, and x and y are both 5, 
-                // that point is definitely inside the circle.
-                //
-                let total = point.x + point.y;
-                if total <= self.grid_size {
-                    retval +=1;
-                } else {
-                    if point.is_in_circle(self.grid_size) {
-                        retval += 1;
-                    }
+                let total = point.x.pow(2) + point.y.pow(2);
+                if total <= r_squared {
+                    retval += 1;
                 }
 
             } else {
