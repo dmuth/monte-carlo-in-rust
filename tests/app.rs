@@ -37,7 +37,6 @@ fn test_app_turbo() {
 }
 
 #[test]
-#[should_panic(expected = "Thead count > 1 currently not supported!")]
 fn test_app_multithreading() {
 
     let mut rng = Random::new(Some(12345));

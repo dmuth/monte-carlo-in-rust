@@ -5,6 +5,9 @@
 use std::fmt;
 use std::sync::Arc;
 use std::thread;
+use std::thread::JoinHandle;
+
+use crossbeam::channel::{self, Sender, Receiver};
 
 use crate::random::Random;
 use crate::grid::Grid;
@@ -102,6 +105,88 @@ impl<'a> App<'a> {
 
 
     /*
+    * Spawn a single thread.
+    */
+    fn thread_spawn(&mut self, i:u64,
+        receiver: &mut Arc< crossbeam::channel::Receiver<i32> >,
+        sender: crossbeam::channel::Sender<String>
+        ) -> JoinHandle<()> {
+
+        let receiver = std::sync::Arc::clone(&receiver);
+        let sender = sender.clone();
+
+        let handle = thread::spawn(move || {
+            while let Ok(task) = receiver.recv() {
+                println!("Thread {} got task {}", i, task);
+            }
+            sender.send( format!("Hello from thread {}", i) ).expect("Error sending response!");
+            println!("Thread {} is done receiving tasks", i);
+        });
+
+        handle
+
+    } // End of thread_spawn()
+
+
+    /*
+    * Spawn our threads.
+    */
+    fn thread_spawn_all(&mut self, 
+        task_receiver: crossbeam::channel::Receiver<i32>, 
+        result_sender: crossbeam::channel::Sender<String>, 
+        num_threads: u64) -> Vec< JoinHandle<()> > {
+
+        // 
+        // The receiver needs to be in Arc for thread safety, but the
+        // sender does not.
+        //
+        let mut task_receiver = std::sync::Arc::new(task_receiver);
+        let mut handles = vec![];
+
+        for i in 0..num_threads {
+            let handle = self.thread_spawn(i, &mut task_receiver, result_sender.clone());
+            handles.push(handle);
+        }
+
+        handles
+
+    } // End of thread_spawn_all()
+
+
+    /*
+    * Solve with multiple threads.
+    */
+    fn go_multi_thread(&mut self, num_threads: u64) -> f64 {
+
+        let (task_sender, task_receiver): (Sender<i32>, Receiver<i32>) = channel::unbounded();
+        let (result_sender, result_receiver): (Sender<String>, Receiver<String>) = channel::unbounded();
+
+        let handles = self.thread_spawn_all(task_receiver, result_sender, num_threads);
+
+        for task in 1..=10 {
+            task_sender.send(task).expect("Failed to send task");
+        }
+
+        // Dropping the sender closes the channel, signaling no more tasks
+        drop(task_sender);
+
+        for result in result_receiver.iter() {
+            println!("MAIN THREAD RECEIVED: {:?}", result);
+        }
+
+        // Wait for all threads to complete
+        for handle in handles {
+            handle.join().expect("Thread panicked");
+        }
+
+        println!("DONE!");
+
+        return 6.9;
+
+    }
+
+
+    /*
     * Our main entry point.  
     * Does all the work and returns the value of Pi.
     */
@@ -109,7 +194,7 @@ impl<'a> App<'a> {
 
         let pi;
         if self.num_threads > 1 {
-            panic!("Thead count > 1 currently not supported!");
+            pi = self.go_multi_thread(self.num_threads);
 
         } else {
             pi = self.go_single_thread();
