@@ -1,11 +1,15 @@
 
 
+//#![cfg_attr(debug_assertions, allow(dead_code, unused_imports, unused_variables))]
+#![cfg_attr(debug_assertions, allow(dead_code))]
+
 use std::time::{Duration, Instant, SystemTime, SystemTimeError};
 
 
 /*
 * Our Timer structure, used to get elapsed time.
 */
+#[derive(Debug)]
 pub struct Timer {
     start_time: Instant,
     start_time_t: SystemTime,

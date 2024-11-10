@@ -25,3 +25,8 @@ pub use grid::Grid;
 mod app;
 pub use app::App;
 
+mod timer;
+
+mod metric;
+pub use metric::Metric;
+
