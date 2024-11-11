@@ -17,6 +17,8 @@ pub struct Metric {
     pub runtime: Option<Duration>,
     pub _grid_size: u64,
     pub _num_points: u64,
+    pub _cache_hits: u64,
+    pub _cache_misses: u64,
 }
 
 
@@ -30,7 +32,9 @@ impl Metric {
             timer: timer, 
             runtime: None,
             _grid_size: grid_size, 
-            _num_points: num_points
+            _num_points: num_points,
+            _cache_hits: 0,
+            _cache_misses: 0,
             };
 
         metric
