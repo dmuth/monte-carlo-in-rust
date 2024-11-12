@@ -15,8 +15,7 @@ use crate::timer::Timer;
 pub struct Metric {
     timer: Timer,
     pub runtime: Option<Duration>,
-    pub _grid_size: u64,
-    pub _num_points: u64,
+    pub num_points: u64,
     pub cache_hits: u64,
     pub cache_misses: u64,
 }
@@ -24,15 +23,14 @@ pub struct Metric {
 
 impl Metric {
 
-    pub fn new(grid_size: u64, num_points: u64) -> Self {
+    pub fn new() -> Self {
 
         let timer = Timer::new();
 
         let metric = Metric{
             timer: timer, 
             runtime: None,
-            _grid_size: grid_size, 
-            _num_points: num_points,
+            num_points: 0,
             cache_hits: 0,
             cache_misses: 0,
             };
@@ -53,6 +51,13 @@ impl Metric {
 
     }
 
+
+    /*
+    * Update the number of points in this metric.
+    */
+    pub fn update_num_points(&mut self, num: u64) {
+        self.num_points += num;
+    }
 
     /*
     * Update our cache hits.

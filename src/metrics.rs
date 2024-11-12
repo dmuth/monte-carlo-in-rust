@@ -24,12 +24,12 @@ pub struct Metrics {
 
 impl Metrics {
 
-    pub fn new(grid_size: u64, num_points: u64) -> Self {
+    pub fn new(grid_size: u64) -> Self {
 
         let metrics = Metrics {
             runtime: None,
             _grid_size: grid_size, 
-            _num_points: num_points,
+            _num_points: 0,
             num_metrics: 0,
             cache_hits: 0,
             cache_misses: 0,
