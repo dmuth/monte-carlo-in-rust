@@ -17,8 +17,8 @@ pub struct Metric {
     pub runtime: Option<Duration>,
     pub _grid_size: u64,
     pub _num_points: u64,
-    pub _cache_hits: u64,
-    pub _cache_misses: u64,
+    pub cache_hits: u64,
+    pub cache_misses: u64,
 }
 
 
@@ -33,8 +33,8 @@ impl Metric {
             runtime: None,
             _grid_size: grid_size, 
             _num_points: num_points,
-            _cache_hits: 0,
-            _cache_misses: 0,
+            cache_hits: 0,
+            cache_misses: 0,
             };
 
         metric
@@ -51,6 +51,22 @@ impl Metric {
 
         self
 
+    }
+
+
+    /*
+    * Update our cache hits.
+    */
+    pub fn update_cache_hits(&mut self, num: u64) {
+        self.cache_hits += num;
+    }
+
+
+    /*
+    * Update our cache misses.
+    */
+    pub fn update_cache_misses(&mut self, num: u64) {
+        self.cache_misses += num;
     }
 
 }

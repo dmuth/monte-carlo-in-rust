@@ -30,3 +30,7 @@ mod timer;
 mod metric;
 pub use metric::Metric;
 
+mod metrics;
+pub use metrics::Metrics;
+
+
