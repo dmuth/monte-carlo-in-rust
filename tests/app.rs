@@ -13,7 +13,7 @@ fn test_app() {
     let random_seed = Some(12345);
     let app = App::new(grid_size, num_points, num_threads, batch_size, false, random_seed);
 
-    let pi = app.go();
+    let (pi, _metrics) = app.go();
     assert_eq!(pi, 2.908);
 
 }
@@ -28,7 +28,7 @@ fn test_app_turbo() {
     let random_seed = Some(12345);
     let app = App::new(grid_size, num_points, num_threads, batch_size, true, random_seed);
 
-    let pi = app.go();
+    let (pi, _metrics) = app.go();
     assert_eq!(pi, 2.908);
 
 }
@@ -43,7 +43,7 @@ fn test_app_multithreading() {
     let random_seed = Some(12345);
     let app = App::new(grid_size, num_points, num_threads, batch_size, false, random_seed);
 
-    let pi = app.go();
+    let (pi, _metrics) = app.go();
     assert_eq!(pi, 2.968);
 
 }

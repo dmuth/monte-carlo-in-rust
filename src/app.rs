@@ -15,8 +15,11 @@ use log::{info, debug};
 use crate::random::Random;
 use crate::grid::Grid;
 use crate::points::Points;
+use crate::metric::Metric;
+use crate::metrics::Metrics;
 
 
+type ResultMessage = (u64, u64, Metric);
 
 /*
 * Our structure.
@@ -73,9 +76,10 @@ impl App {
     /*
     * Run things in a single thread.
     */
-    fn go_single_thread(&mut self) -> f64 {
+    fn go_single_thread(&mut self) -> (f64, Metrics) {
 
         let mut grid = Grid::new(self.grid_size);
+        let mut metrics = Metrics::new(self.grid_size);
 
         loop {
 
@@ -83,6 +87,14 @@ impl App {
             if num_points == 0 {
                 break
             }
+
+            //
+            // We're creating our metric here, because we want single thread
+            // metrics to mirror how they're created in multi-threading as 
+            // closely as possible.
+            //
+            let mut metric = Metric::new();
+            metric.update_num_points(num_points);
 
             let mut rng = Random::new(self.random_seed);
             let points = Points::new(&mut rng, self.grid_size, num_points);
@@ -95,6 +107,7 @@ impl App {
             }
 
             let points_not_in_circle = num_points - points_in_circle;
+            metrics.add_metric(metric);
 
             grid.update_num_points_in_circle(points_in_circle);
             grid.update_num_points_not_in_circle(points_not_in_circle);
@@ -103,7 +116,7 @@ impl App {
 
         let pi = grid.calculate_pi().unwrap();
 
-        pi
+        (pi, metrics)
 
     } // End of go_single_thread()
 
@@ -113,7 +126,7 @@ impl App {
     */
     fn thread_spawn(&mut self, i:u64,
         receiver: &mut Arc< crossbeam::channel::Receiver<u64> >,
-        sender: crossbeam::channel::Sender< (u64, u64) >
+        sender: crossbeam::channel::Sender< ResultMessage >
         ) -> JoinHandle<()> {
 
         let receiver = std::sync::Arc::clone(&receiver);
@@ -127,7 +140,11 @@ impl App {
             let mut rng = Random::new(random_seed);
 
             while let Ok(num_points) = receiver.recv() {
+
                 debug!("Thread {} needs to calculate {} points.", i, num_points); // Debugging
+
+                let mut metric = Metric::new();
+                metric.update_num_points(num_points);
 
                 let points = Points::new(&mut rng, grid_size, num_points);
 
@@ -139,7 +156,7 @@ impl App {
                 }
 
                 let points_not_in_circle = num_points - points_in_circle;
-                sender.send( (points_in_circle, points_not_in_circle) 
+                sender.send( (points_in_circle, points_not_in_circle, metric) 
                     ).expect("Error sending response!");
 
             }
@@ -156,7 +173,7 @@ impl App {
     */
     fn thread_spawn_all(&mut self, 
         task_receiver: crossbeam::channel::Receiver<u64>, 
-        result_sender: crossbeam::channel::Sender< (u64, u64) >, 
+        result_sender: crossbeam::channel::Sender< ResultMessage >, 
         num_threads: u64) -> Vec< JoinHandle<()> > {
 
         // 
@@ -179,15 +196,18 @@ impl App {
     /*
     * Solve with multiple threads.
     */
-    fn go_multi_thread(&mut self, num_threads: u64) -> f64 {
+    fn go_multi_thread(&mut self, num_threads: u64) -> (f64, Metrics) {
 
         let (task_sender, task_receiver): (Sender<u64>, Receiver<u64>) = channel::unbounded();
-        let (result_sender, result_receiver): (Sender< (u64, u64) >, Receiver< (u64, u64) >) = channel::unbounded();
+        let (result_sender, result_receiver): (
+            Sender< ResultMessage >, Receiver< ResultMessage >) = channel::unbounded();
 
+        // Spin up our threads
         let handles = self.thread_spawn_all(task_receiver, result_sender, num_threads);
 
-        let mut grid = Grid::new(self.grid_size);
-
+        //
+        // Now send off all of our messages to our threads.
+        //
         loop {
 
             let num_points = self.get_batch_count();
@@ -199,14 +219,24 @@ impl App {
 
         }
 
-        // Dropping the sender closes the channel, signaling no more tasks
+        //
+        // Dropping the variable will close the channel, so all 
+        // threads will exit when done.
+        //
         drop(task_sender);
 
+        let mut grid = Grid::new(self.grid_size);
+        let mut metrics = Metrics::new(self.grid_size);
+
+        //
+        // Loop through our results and update our grid and metrics.
+        //
         for result in result_receiver.iter() {
 
             debug!("MAIN THREAD RECEIVED: {:?}", result);
 
-            let (points_in_circle, points_not_in_circle) = result;
+            let (points_in_circle, points_not_in_circle, metric) = result;
+            metrics.add_metric(metric);
 
             grid.update_num_points_in_circle(points_in_circle);
             grid.update_num_points_not_in_circle(points_not_in_circle);
@@ -214,6 +244,7 @@ impl App {
         }
 
         // Wait for all threads to complete
+        debug!("Waiting for threads to complete...");
         for handle in handles {
             handle.join().expect("Thread panicked");
         }
@@ -221,7 +252,7 @@ impl App {
         info!("Done reading results from threads!");
 
         let pi = grid.calculate_pi().unwrap();
-        return pi;
+        return (pi, metrics);
 
     }
 
@@ -230,17 +261,18 @@ impl App {
     * Our main entry point.  
     * Does all the work and returns the value of Pi.
     */
-    pub fn go(mut self: App) -> f64 {
+    pub fn go(mut self: App) -> (f64, Metrics) {
 
         let pi;
+        let metrics;
         if self.num_threads > 1 {
-            pi = self.go_multi_thread(self.num_threads);
+            (pi, metrics) = self.go_multi_thread(self.num_threads);
 
         } else {
-            pi = self.go_single_thread();
+            (pi, metrics) = self.go_single_thread();
         }
     
-        pi
+        (pi, metrics)
 
     } // End of go()
 
