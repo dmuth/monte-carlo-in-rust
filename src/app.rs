@@ -122,26 +122,19 @@ impl App {
 
 
     /*
-    * Spawn a single thread.
+    * Our core thread function.
     */
-    fn thread_spawn(&mut self, i:u64,
-        receiver: &mut Arc< crossbeam::channel::Receiver<u64> >,
-        sender: crossbeam::channel::Sender< ResultMessage >
-        ) -> JoinHandle<()> {
-
-        let receiver = std::sync::Arc::clone(&receiver);
-        let sender = sender.clone();
-        let random_seed = self.random_seed;
-        let grid_size = self.grid_size;
-        let turbo = self.turbo;
-
-        let handle = thread::spawn(move || {
+    fn thread_spawn_core(thread_id: u64,
+        receiver: Arc< crossbeam::channel::Receiver<u64> >,
+        sender: crossbeam::channel::Sender< ResultMessage >,
+        random_seed: Option<u64>, grid_size: u64, turbo: bool
+        ) {
 
             let mut rng = Random::new(random_seed);
 
             while let Ok(num_points) = receiver.recv() {
 
-                debug!("Thread {} needs to calculate {} points.", i, num_points); // Debugging
+                debug!("Thread {} needs to calculate {} points.", thread_id, num_points);
 
                 let mut metric = Metric::new();
                 metric.update_num_points(num_points);
@@ -161,6 +154,29 @@ impl App {
 
             }
 
+    } // End of thread_spawn_core()
+
+    /*
+    * Spawn a single thread.
+    */
+    fn thread_spawn(&mut self, thread_id:u64,
+        receiver: &mut Arc< crossbeam::channel::Receiver<u64> >,
+        sender: crossbeam::channel::Sender< ResultMessage >
+        ) -> JoinHandle<()> {
+
+        let receiver = std::sync::Arc::clone(&receiver);
+        let sender = sender.clone();
+        //
+        // Why are we creating those variables instead of just passing in self.turbo, etc.?
+        // Turns out that doing that causes self to potentially leak outside of the thread,
+        // and the Rust compiler doesn't like that.
+        //
+        let random_seed = self.random_seed;
+        let grid_size = self.grid_size;
+        let turbo = self.turbo;
+
+        let handle = thread::spawn(move || {
+            Self::thread_spawn_core(thread_id, receiver, sender, random_seed, grid_size, turbo );
         });
 
         handle
