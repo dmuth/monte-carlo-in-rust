@@ -9,16 +9,22 @@ use log::{info};
 use std::thread::sleep;
 use std::time::Instant;
 use std::time::Duration;
+use std::collections::HashMap;
 
 use env_logger::{Builder, Env};
+use serde_json::json;
 
 mod args;
+mod app;
 mod grid;
+mod metric;
+mod metrics;
 mod point;
 mod points;
 mod random;
 mod timer;
 
+use app::App;
 use grid::Grid;
 use points::{Points};
 use random::Random;
@@ -27,13 +33,6 @@ use timer::Timer;
 
 
 fn main() {
-
-    let mut timer = Timer::new();
-    println!("TEST elapsed: {:?}, {:?}", timer.get_elapsed(), timer.get_elapsed_time_t().unwrap() );
-    sleep(Duration::from_millis(100));
-    println!("TEST elapsed: {:?}, {:?}", timer.get_elapsed(), timer.get_elapsed_time_t().unwrap() );
-
-    let start_time = Instant::now();
 
     // Set default logging level to info.
     Builder::from_env(Env::default().default_filter_or("info"))
@@ -44,22 +43,32 @@ fn main() {
     info!("Args: {:?}", args);
     //sleep(Duration::from_millis(100));
 
-    let mut rng = Random::new(None);
+    let grid_size = 10;
+    let num_points = 1000;
+    let num_threads = 2;
+    let batch_size = 100;
+    let random_seed = Some(12345);
+    let turbo = false;
+    let app = App::new(grid_size, num_points, num_threads, batch_size, turbo, random_seed);
 
-    let points = Points::new(&mut rng, 10, 10);
-    println!("TEST POINTS: {:?}", points);
+    let (pi, metrics) = app.go();
+
+    let data = json!({
+        "pi": pi,
+        "grid_size": grid_size,
+        "num_points": num_points,
+        "num_threads": num_threads,
+        "batch_size": batch_size,
+        "random_seed": random_seed,
+        "turbo": turbo,
+        "metrics": 
+            serde_json::to_string(&metrics).expect("Unable to serialize metrics")
+        });
 
 
-    println!("Random number between 1 and 10: {:?}", rng.get(1, 10) );
-    let point = rng.get_point(10);
-    println!("Random point: {}, {}", point.x, point.y );
-
-    info!("Time elapsed: {:?}", start_time.elapsed());
-
-    let grid = Grid::new(10);
-    println!("GRID: {:?}", grid);
-
-    println!("Hello, world!");
+    println!("Pi: {:?}", pi);
+    println!("Metrics: {:?}", metrics);
+    println!("JSON: {}", data.to_string() );
 
 } // End of main()
 

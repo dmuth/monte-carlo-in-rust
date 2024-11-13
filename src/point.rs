@@ -15,7 +15,7 @@ pub struct Point {
 impl Point {
 
     /*
-    * Return our points for diagnostic purposes.
+    * Use the Pythagorean Theroem to determine if this point is in the circle.
     */
     pub fn is_in_circle(self: Point, grid_size: u64) -> bool {
         let hyp = ( 

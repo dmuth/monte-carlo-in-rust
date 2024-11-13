@@ -97,6 +97,10 @@ impl Points {
         for point in self.points {
 
             if turbo {
+                //
+                // If we're using turbo, don't bother with the square roots but instead
+                // just compare the squared values.
+                //
                 let total = point.x.pow(2) + point.y.pow(2);
                 if total <= r_squared {
                     retval += 1;
