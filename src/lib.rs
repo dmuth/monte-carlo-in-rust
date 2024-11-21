@@ -12,9 +12,17 @@ pub use random::Random;
 //
 mod point;
 pub use point::Point;
+
 mod points;
 pub use points::Points;
 pub use points::CircleMode;
+
+mod app;
+pub use app::App;
+
+mod cache;
+pub use cache::Cache;
+pub use cache::CacheState;
 
 //
 // Declare our Grid module
@@ -22,15 +30,12 @@ pub use points::CircleMode;
 mod grid;
 pub use grid::Grid;
 
-mod app;
-pub use app::App;
-
-mod timer;
-
 mod metric;
 pub use metric::Metric;
 
 mod metrics;
 pub use metrics::Metrics;
+
+mod timer;
 
 
