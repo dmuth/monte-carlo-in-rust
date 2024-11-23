@@ -151,9 +151,7 @@ impl App {
                     (points_in_circle, cache_stats) = points.get_points_in_circle();
                 }
 
-                //metric.update_cache_hits(cache_stats.hits);
-// TEST
-                metric.update_cache_hits(69);
+                metric.update_cache_hits(cache_stats.hits);
                 metric.update_cache_misses(cache_stats.misses);
 
                 let points_not_in_circle = num_points - points_in_circle;
