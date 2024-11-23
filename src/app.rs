@@ -7,16 +7,15 @@ use std::sync::Arc;
 use std::thread;
 use std::thread::JoinHandle;
 
-
 use crossbeam::channel::{self, Sender, Receiver};
-
 use log::{info, debug};
 
-use crate::random::Random;
+use crate::cache::CacheStats;
 use crate::grid::Grid;
 use crate::points::Points;
 use crate::metric::Metric;
 use crate::metrics::Metrics;
+use crate::random::Random;
 
 
 type ResultMessage = (u64, u64, Metric);
@@ -97,16 +96,19 @@ impl App {
             metric.update_num_points(num_points);
 
             let mut rng = Random::new(self.random_seed);
-            let points = Points::new(&mut rng, self.grid_size, num_points);
+            let points = Points::new(&mut rng, self.grid_size, num_points, None);
 
             let points_in_circle;
+            let cache_stats: CacheStats;
             if ! self.turbo {
-                points_in_circle = points.get_points_in_circle();
+                (points_in_circle, cache_stats) = points.get_points_in_circle();
             } else {
-                points_in_circle = points.get_points_in_circle_turbo();
+                (points_in_circle, cache_stats) = points.get_points_in_circle_turbo();
             }
 
             let points_not_in_circle = num_points - points_in_circle;
+            metric.update_cache_hits(cache_stats.hits);
+            metric.update_cache_misses(cache_stats.misses);
             metrics.add_metric(metric);
 
             grid.update_num_points_in_circle(points_in_circle);
@@ -139,14 +141,20 @@ impl App {
                 let mut metric = Metric::new();
                 metric.update_num_points(num_points);
 
-                let points = Points::new(&mut rng, grid_size, num_points);
+                let points = Points::new(&mut rng, grid_size, num_points, None);
 
                 let points_in_circle;
+                let cache_stats: CacheStats;
                 if ! turbo {
-                    points_in_circle = points.get_points_in_circle();
+                    (points_in_circle, cache_stats) = points.get_points_in_circle();
                 } else {
-                    points_in_circle = points.get_points_in_circle_turbo();
+                    (points_in_circle, cache_stats) = points.get_points_in_circle();
                 }
+
+                //metric.update_cache_hits(cache_stats.hits);
+// TEST
+                metric.update_cache_hits(69);
+                metric.update_cache_misses(cache_stats.misses);
 
                 let points_not_in_circle = num_points - points_in_circle;
                 sender.send( (points_in_circle, points_not_in_circle, metric) 
@@ -155,6 +163,7 @@ impl App {
             }
 
     } // End of thread_spawn_core()
+
 
     /*
     * Spawn a single thread.

@@ -3,13 +3,14 @@
 //#![cfg_attr(debug_assertions, allow(dead_code, unused_imports, unused_variables))]
 
 
-use crate::Point;
+use crate::point::Point;
 
 
 /*
 * Our cache
 */
 //#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct Cache {
     pub grid_size: u64,
     data: Vec<Vec<CacheState>>,
@@ -26,6 +27,16 @@ pub enum CacheState {
     True,
     False,
     Unknown,
+}
+
+
+/*
+* Stats on our cache usage that are returned in a structure.
+*/
+#[derive(Debug)]
+pub struct CacheStats {
+    pub hits: u64,
+    pub misses: u64,
 }
 
 
@@ -86,10 +97,10 @@ impl Cache {
 
 
     /*
-    * Return our metrics.
+    * Return our stats for this cache.
     */
-    pub fn get_metrics(&self) -> (u64, u64) {
-        (self.hits, self.misses)
+    pub fn get_stats(&self) -> CacheStats {
+        CacheStats{ hits: self.hits, misses: self.misses }
     }
 
 

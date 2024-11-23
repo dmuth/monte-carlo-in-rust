@@ -23,6 +23,7 @@ pub use app::App;
 mod cache;
 pub use cache::Cache;
 pub use cache::CacheState;
+pub use cache::CacheStats;
 
 //
 // Declare our Grid module

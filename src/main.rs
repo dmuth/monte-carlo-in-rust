@@ -16,6 +16,7 @@ use serde_json::json;
 
 mod args;
 mod app;
+mod cache;
 mod grid;
 mod metric;
 mod metrics;

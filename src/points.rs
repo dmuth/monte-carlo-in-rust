@@ -9,6 +9,7 @@
 
 use crate::random::Random;
 use crate::point::Point;
+use crate::cache::{Cache, CacheStats};
 
 use log::{info};
 
@@ -25,6 +26,7 @@ pub enum CircleMode {
 pub struct Points {
     points: Vec<Point>,
     grid_size: u64,
+    cache: Option<Cache>,
 }
 
 
@@ -37,7 +39,8 @@ impl Points {
     * grid_size - How big is the square we're plotting points in?
     * num_points - How many points to plot in the square?
     */
-    pub fn new(rng: &mut Random, grid_size: u64, num_points: u64) -> Self {
+    pub fn new(rng: &mut Random, grid_size: u64, num_points: u64, 
+        cache: Option<Cache>) -> Self {
 
         let mut points = Vec::<Point>::new();
 
@@ -48,6 +51,7 @@ impl Points {
         Points {
             points: points,
             grid_size: grid_size,
+            cache: cache,
         }
 
     }
@@ -57,11 +61,13 @@ impl Points {
     * This version of the constructor is used when we want to manually insert
     * pre-generated points for testing purposes.
     */
-    pub fn new_with_points(grid_size: u64, points: Vec::<Point>) -> Self {
+    pub fn new_with_points(grid_size: u64, points: Vec::<Point>, 
+        cache: Option<Cache>) -> Self {
 
         Points {
             points: points,
             grid_size: grid_size,
+            cache: cache,
         }
 
     }
@@ -78,9 +84,9 @@ impl Points {
     /*
     * Our core function to get the number of points inside our circle.
     */
-    pub fn _get_points_in_circle(self: Points, mode:Option<CircleMode>) -> u64 {
+    pub fn _get_points_in_circle(self: Points, mode:Option<CircleMode>) -> (u64, CacheStats) {
 
-        let mut retval = 0;
+        let mut num_points = 0;
         let turbo: bool;
         let r_squared = self.grid_size.pow(2);
 
@@ -94,7 +100,7 @@ impl Points {
             }
         }
 
-        for point in self.points {
+        for point in &self.points {
 
             if turbo {
                 //
@@ -103,20 +109,22 @@ impl Points {
                 //
                 let total = point.x.pow(2) + point.y.pow(2);
                 if total <= r_squared {
-                    retval += 1;
+                    num_points += 1;
                 }
 
             } else {
 
                 if point.is_in_circle(self.grid_size) {
-                    retval += 1;
+                    num_points += 1;
                 }
 
             }
 
         }
 
-        retval
+        let stats = self.get_cache_stats();
+
+        (num_points, stats)
 
     } // End of _get_points_in_circle()
 
@@ -124,14 +132,30 @@ impl Points {
     /*
     * Count the number of points in a circle.
     */
-    pub fn get_points_in_circle(self: Points) -> u64 {
+    pub fn get_points_in_circle(self: Points) -> (u64, CacheStats) {
         self._get_points_in_circle(None)
     }
 
-    pub fn get_points_in_circle_turbo(self: Points) -> u64 {
+    pub fn get_points_in_circle_turbo(self: Points) -> (u64, CacheStats) {
         self._get_points_in_circle(Some(CircleMode::Turbo))
     }   
 
+
+    /*
+    * Get stats from the cache
+    */
+    fn get_cache_stats(self: Points) -> CacheStats {
+
+        match &self.cache {
+            Some(cache) => {
+                cache.get_stats()
+            },
+            None => {
+                CacheStats{hits: 0, misses: 0}
+            }
+        }
+
+    } // End of get_cache_stats()
 
 }
 
