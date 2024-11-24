@@ -49,7 +49,11 @@ impl Cache {
         //
         assert!(grid_size <= usize::MAX as u64, "Cache::new(): Value out of range for usize");
 
-        let size = grid_size as usize;
+        //
+        // Add one because if the grid is say, 10 points, the values 
+        // range from 0 to 10 inclusive.
+        //
+        let size = grid_size as usize + 1;
 
         Cache {
             grid_size: grid_size,

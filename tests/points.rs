@@ -81,8 +81,9 @@ fn test_points_calculate_points_in_circle_with_seed_and_cache() {
 
     let points = Points::new(&mut rng, grid_size, num_points, Some(cache));
 
-    let (num_points, _) = points.get_points_in_circle();
+    let (num_points, stats) = points.get_points_in_circle();
     assert_eq!(num_points, 9);
+    assert_eq!(stats.hits, 1);
 
 
 }
@@ -97,8 +98,9 @@ fn test_points_calculate_points_in_circle_turbo_with_seed_and_cache() {
 
     let points = Points::new(&mut rng, grid_size, num_points, Some(cache));
 
-    let (num_points, _) = points.get_points_in_circle_turbo();
+    let (num_points, stats) = points.get_points_in_circle_turbo();
     assert_eq!(num_points, 9);
+    assert_eq!(stats.hits, 1);
 
 }
 

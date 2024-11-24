@@ -9,7 +9,7 @@
 
 use crate::random::Random;
 use crate::point::Point;
-use crate::cache::{Cache, CacheStats};
+use crate::cache::{Cache, CacheStats, CacheState};
 
 use log::{info};
 
@@ -82,42 +82,83 @@ impl Points {
 
 
     /*
-    * Our core function to get the number of points inside our circle.
+    * Check to see if a specific point is in the circle.
     */
-    pub fn _get_points_in_circle(self: Points, mode:Option<CircleMode>) -> (u64, CacheStats) {
-
-        let mut num_points = 0;
-        let turbo: bool;
-        let r_squared = self.grid_size.pow(2);
+    fn _check_point(&self, mode: &Option<CircleMode>, r_squared: u64, point: &Point) -> bool {
 
         match mode {
             Some(CircleMode::Turbo) => { 
-                info!("Setting turbo mode for circle analysis!");
-                turbo = true; 
-            }
-            None => { 
-                turbo = false; 
-            }
-        }
-
-        for point in &self.points {
-
-            if turbo {
                 //
                 // If we're using turbo, don't bother with the square roots but instead
                 // just compare the squared values.
                 //
                 let total = point.x.pow(2) + point.y.pow(2);
                 if total <= r_squared {
-                    num_points += 1;
+                    return true;
                 }
-
-            } else {
-
+            },
+            None => { 
                 if point.is_in_circle(self.grid_size) {
-                    num_points += 1;
+                    return true;
                 }
+            }
+        }
 
+        return false;
+
+    } // End of _check_point()
+
+
+    /*
+    * Our core function to get the number of points inside our circle.
+    */
+    pub fn _get_points_in_circle(mut self: Points, mode:Option<CircleMode>) -> (u64, CacheStats) {
+
+        let mut num_points = 0;
+        let r_squared = self.grid_size.pow(2);
+
+        match mode {
+            Some(CircleMode::Turbo) => { 
+                info!("Setting turbo mode for circle analysis!");
+            },
+            _ => {}
+        }
+
+        for point in &self.points {
+
+            //
+            // Check the cache first (if it exists), if there's a hit, we have a value and can
+            // skip the rest of this loop.
+            //
+            match self.cache {
+                Some(ref mut cache) => {
+                    if cache.has(*point) {
+                        match cache.get(*point) {
+                            CacheState::True => {
+                                num_points += 1;
+                            },
+                            _ => {},
+                        }
+                        continue;
+                    }
+                },
+                None => {}
+            }
+
+            //
+            // Check the point manually, optionally saving the result to the cache if it exists.
+            //
+            let in_circle = self._check_point(&mode, r_squared, point);
+
+            if in_circle {
+                num_points += 1;
+                if let Some(ref mut cache) = self.cache {
+                    cache.set(*point, CacheState::True);
+                }
+            } else {
+                if let Some(ref mut cache) = self.cache {
+                    cache.set(*point, CacheState::False);
+                }
             }
 
         }
