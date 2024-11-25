@@ -10,7 +10,7 @@ use std::thread::JoinHandle;
 use crossbeam::channel::{self, Sender, Receiver};
 use log::{info, debug};
 
-use crate::cache::CacheStats;
+use crate::cache::{Cache, CacheStats};
 use crate::grid::Grid;
 use crate::points::Points;
 use crate::metric::Metric;
@@ -29,6 +29,7 @@ pub struct App {
     num_points_left: u64,
     num_threads: u64,
     batch_size: u64,
+    cache: bool,
     turbo: bool,
     random_seed: Option<u64>,
 }
@@ -46,6 +47,7 @@ impl fmt::Debug for App {
             .field("num_points_left", &self.num_points_left)
             .field("num_threads", &self.num_threads)
             .field("batch_size", &self.batch_size)
+            .field("cache", &self.cache)
             .field("turbo", &self.turbo)
             .field("random_seed", &self.random_seed)
             .finish()
@@ -57,7 +59,8 @@ impl fmt::Debug for App {
 impl App {
 
     pub fn new(grid_size: u64, num_points: u64, 
-        num_threads: u64, batch_size: u64, turbo: bool, random_seed: Option<u64>) -> Self {
+        num_threads: u64, batch_size: u64, cache: bool, 
+        turbo: bool, random_seed: Option<u64>) -> Self {
 
         App {
             grid_size: grid_size,
@@ -65,6 +68,7 @@ impl App {
             num_points_left: num_points,
             num_threads: num_threads,
             batch_size: batch_size,
+            cache: cache,
             turbo: turbo,
             random_seed: random_seed,
             }
@@ -79,6 +83,10 @@ impl App {
 
         let mut grid = Grid::new(self.grid_size);
         let mut metrics = Metrics::new(self.grid_size);
+
+// TEST
+        //let cache = self.cache;
+        //let cache = Some(Cache::new(self.grid_size));
 
         loop {
 
@@ -96,6 +104,8 @@ impl App {
             metric.update_num_points(num_points);
 
             let mut rng = Random::new(self.random_seed);
+            //let points = Points::new(&mut rng, self.grid_size, num_points, &cache);
+// TEST
             let points = Points::new(&mut rng, self.grid_size, num_points, None);
 
             let points_in_circle;
@@ -109,7 +119,9 @@ impl App {
             let points_not_in_circle = num_points - points_in_circle;
             metric.update_cache_hits(cache_stats.hits);
             metric.update_cache_misses(cache_stats.misses);
+//println!("TEST metric: {:?}", metric);
             metrics.add_metric(metric);
+//println!("TEST METRICS: {:?}", metrics);
 
             grid.update_num_points_in_circle(points_in_circle);
             grid.update_num_points_not_in_circle(points_not_in_circle);
@@ -129,10 +141,14 @@ impl App {
     fn thread_spawn_core(thread_id: u64,
         receiver: Arc< crossbeam::channel::Receiver<u64> >,
         sender: crossbeam::channel::Sender< ResultMessage >,
-        random_seed: Option<u64>, grid_size: u64, turbo: bool
+        random_seed: Option<u64>, grid_size: u64, 
+        cache: bool, turbo: bool
         ) {
 
             let mut rng = Random::new(random_seed);
+        
+// TEST
+            //let cache = Some(Cache::new(self.grid_size));
 
             while let Ok(num_points) = receiver.recv() {
 
@@ -141,6 +157,8 @@ impl App {
                 let mut metric = Metric::new();
                 metric.update_num_points(num_points);
 
+                //let points = Points::new(&mut rng, grid_size, num_points, &cache);
+// TEST
                 let points = Points::new(&mut rng, grid_size, num_points, None);
 
                 let points_in_circle;
@@ -180,10 +198,13 @@ impl App {
         //
         let random_seed = self.random_seed;
         let grid_size = self.grid_size;
+        //let cache = self.cache;
+// TEST
+        let cache = false;
         let turbo = self.turbo;
 
         let handle = thread::spawn(move || {
-            Self::thread_spawn_core(thread_id, receiver, sender, random_seed, grid_size, turbo );
+            Self::thread_spawn_core(thread_id, receiver, sender, random_seed, grid_size, cache, turbo );
         });
 
         handle

@@ -50,7 +50,8 @@ fn main() {
     let batch_size = 100;
     let random_seed = Some(12345);
     let turbo = false;
-    let app = App::new(grid_size, num_points, num_threads, batch_size, turbo, random_seed);
+    let cache = false;
+    let app = App::new(grid_size, num_points, num_threads, batch_size, cache, turbo, random_seed);
 
     let (pi, metrics) = app.go();
 
