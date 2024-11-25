@@ -7,11 +7,14 @@
 //
 #![cfg_attr(debug_assertions, allow(dead_code))]
 
+use std::rc::Rc;
+use std::cell::RefCell;
+
+use log::{info};
+
 use crate::random::Random;
 use crate::point::Point;
 use crate::cache::{Cache, CacheStats, CacheState};
-
-use log::{info};
 
 
 pub enum CircleMode {
@@ -26,7 +29,7 @@ pub enum CircleMode {
 pub struct Points {
     points: Vec<Point>,
     grid_size: u64,
-    cache: Option<Cache>,
+    cache: Option<Rc<RefCell<Cache>>>,
 }
 
 
@@ -40,7 +43,7 @@ impl Points {
     * num_points - How many points to plot in the square?
     */
     pub fn new(rng: &mut Random, grid_size: u64, num_points: u64, 
-        cache: Option<Cache>) -> Self {
+        cache: Option<Rc<RefCell<Cache>>>) -> Self {
 
         let mut points = Vec::<Point>::new();
 
@@ -62,7 +65,7 @@ impl Points {
     * pre-generated points for testing purposes.
     */
     pub fn new_with_points(grid_size: u64, points: Vec::<Point>, 
-        cache: Option<Cache>) -> Self {
+        cache: Option<Rc<RefCell<Cache>>>) -> Self {
 
         Points {
             points: points,
@@ -132,8 +135,8 @@ impl Points {
             //
             match self.cache {
                 Some(ref mut cache) => {
-                    if cache.has(*point) {
-                        match cache.get(*point) {
+                    if cache.borrow_mut().has(*point) {
+                        match cache.borrow().get(*point) {
                             CacheState::True => {
                                 num_points += 1;
                             },
@@ -153,11 +156,11 @@ impl Points {
             if in_circle {
                 num_points += 1;
                 if let Some(ref mut cache) = self.cache {
-                    cache.set(*point, CacheState::True);
+                    cache.borrow_mut().set(*point, CacheState::True);
                 }
             } else {
                 if let Some(ref mut cache) = self.cache {
-                    cache.set(*point, CacheState::False);
+                    cache.borrow_mut().set(*point, CacheState::False);
                 }
             }
 
@@ -189,7 +192,7 @@ impl Points {
 
         match &self.cache {
             Some(cache) => {
-                cache.get_stats()
+                cache.borrow().get_stats()
             },
             None => {
                 CacheStats{hits: 0, misses: 0}

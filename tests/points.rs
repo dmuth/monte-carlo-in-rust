@@ -1,5 +1,8 @@
 
 
+use std::rc::Rc;
+use std::cell::RefCell;
+
 use monte_carlo::Random;
 use monte_carlo::Point;
 use monte_carlo::Points;
@@ -77,8 +80,8 @@ fn test_points_calculate_points_in_circle_with_seed_and_cache() {
     let mut rng = Random::new(Some(12345));
     let grid_size = 10;
     let num_points = 10;
-    let cache = Cache::new(grid_size);
-
+    let cache = Rc::new(RefCell::new(Cache::new(grid_size)));
+    
     let points = Points::new(&mut rng, grid_size, num_points, Some(cache));
 
     let (num_points, stats) = points.get_points_in_circle();
@@ -94,7 +97,7 @@ fn test_points_calculate_points_in_circle_turbo_with_seed_and_cache() {
     let mut rng = Random::new(Some(12345));
     let grid_size = 10;
     let num_points = 10;
-    let cache = Cache::new(grid_size);
+    let cache = Rc::new(RefCell::new(Cache::new(grid_size)));
 
     let points = Points::new(&mut rng, grid_size, num_points, Some(cache));
 
