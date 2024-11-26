@@ -1,7 +1,6 @@
 
 
 use monte_carlo::App;
-use monte_carlo::Cache;
 
 
 #[test]
@@ -19,12 +18,34 @@ fn test_app() {
     assert_eq!(metrics.cache_hits, 0);
     assert_eq!(metrics.cache_misses, 0);
 
-    let app = App::new(grid_size, num_points, num_threads, batch_size, true, false, random_seed);
+}
+
+
+#[test]
+fn test_app_cache() {
+
+    let grid_size = 10;
+    let num_points = 1000;
+    let num_threads = 1;
+    let batch_size = 1000;
+    let random_seed = Some(12345);
+    let cache = true;
+
+    let app = App::new(grid_size, num_points, num_threads, batch_size, cache, false, random_seed);
     let (pi, metrics) = app.go();
     assert_eq!(pi, 2.908);
-println!("TEST: {:?}", metrics);
+    assert_eq!(metrics.cache_hits, 879);
+    assert_eq!(metrics.cache_misses, 121);
+
+    let num_points = 1001;
+    let app = App::new(grid_size, num_points, num_threads, batch_size, cache, false, random_seed);
+    let (pi, metrics) = app.go();
+    assert_eq!(pi, 2.909090909090909);
+    assert_eq!(metrics.cache_hits, 880);
+    assert_eq!(metrics.cache_misses, 121);
 
 }
+
 
 #[test]
 fn test_app_turbo() {

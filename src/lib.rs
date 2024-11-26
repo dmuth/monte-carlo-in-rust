@@ -38,5 +38,6 @@ mod metrics;
 pub use metrics::Metrics;
 
 mod timer;
+pub use timer::Timer;
 
 

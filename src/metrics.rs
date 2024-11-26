@@ -8,8 +8,6 @@ use std::time::Duration;
 use serde::Serialize;
 use serde::Serializer;
 
-use crate::metric::Metric;
-
 
 /*
 * Our metric.

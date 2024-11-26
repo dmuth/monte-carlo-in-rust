@@ -2,7 +2,9 @@
 // Debugging
 //#![cfg_attr(debug_assertions, allow(dead_code, unused_imports, unused_variables))]
 
+use std::cell::RefCell;
 use std::fmt;
+use std::rc::Rc;
 use std::sync::Arc;
 use std::thread;
 use std::thread::JoinHandle;
@@ -16,6 +18,7 @@ use crate::points::Points;
 use crate::metric::Metric;
 use crate::metrics::Metrics;
 use crate::random::Random;
+use crate::timer::Timer;
 
 
 type ResultMessage = (u64, u64, Metric);
@@ -81,52 +84,52 @@ impl App {
     */
     fn go_single_thread(&mut self) -> (f64, Metrics) {
 
+        let mut timer = Timer::new();
         let mut grid = Grid::new(self.grid_size);
         let mut metrics = Metrics::new(self.grid_size);
 
-// TEST
-        //let cache = self.cache;
-        //let cache = Some(Cache::new(self.grid_size));
+        let mut cache = None;
+        match self.cache {
+            true => {
+                cache = Some(Rc::new(RefCell::new(Cache::new(self.grid_size))));
+            },
+            _ => {}
+        }
 
         loop {
 
             let num_points = self.get_batch_count();
+
             if num_points == 0 {
                 break
             }
 
-            //
-            // We're creating our metric here, because we want single thread
-            // metrics to mirror how they're created in multi-threading as 
-            // closely as possible.
-            //
-            let mut metric = Metric::new();
-            metric.update_num_points(num_points);
-
+            metrics.num_points += num_points;
+            metrics.num_metrics += 1;
+           
             let mut rng = Random::new(self.random_seed);
-            //let points = Points::new(&mut rng, self.grid_size, num_points, &cache);
-// TEST
-            let points = Points::new(&mut rng, self.grid_size, num_points, None);
+            let cache = cache.clone();
+            let points = Points::new(&mut rng, self.grid_size, num_points, cache);
 
             let points_in_circle;
-            let cache_stats: CacheStats;
             if ! self.turbo {
-                (points_in_circle, cache_stats) = points.get_points_in_circle();
+                points_in_circle = points.get_points_in_circle();
             } else {
-                (points_in_circle, cache_stats) = points.get_points_in_circle_turbo();
+                points_in_circle = points.get_points_in_circle_turbo();
             }
 
             let points_not_in_circle = num_points - points_in_circle;
-            metric.update_cache_hits(cache_stats.hits);
-            metric.update_cache_misses(cache_stats.misses);
-//println!("TEST metric: {:?}", metric);
-            metrics.add_metric(metric);
-//println!("TEST METRICS: {:?}", metrics);
 
             grid.update_num_points_in_circle(points_in_circle);
             grid.update_num_points_not_in_circle(points_not_in_circle);
 
         }
+
+        let cache_stats = cache.unwrap().borrow().get_stats();
+
+        metrics.cache_hits = cache_stats.hits;
+        metrics.cache_misses = cache_stats.misses;
+        metrics.runtime = Some(timer.get_elapsed());
 
         let pi = grid.calculate_pi().unwrap();
 
@@ -142,41 +145,46 @@ impl App {
         receiver: Arc< crossbeam::channel::Receiver<u64> >,
         sender: crossbeam::channel::Sender< ResultMessage >,
         random_seed: Option<u64>, grid_size: u64, 
-        cache: bool, turbo: bool
+        cache_in: bool, turbo: bool
         ) {
 
-            let mut rng = Random::new(random_seed);
+        let mut rng = Random::new(random_seed);
         
-// TEST
-            //let cache = Some(Cache::new(self.grid_size));
+        let mut cache = None;
+        match cache_in {
+            true => {
+                cache = Some(Rc::new(RefCell::new(Cache::new(grid_size))));
+            },
+            _ => {}
+        }
 
-            while let Ok(num_points) = receiver.recv() {
+        while let Ok(num_points) = receiver.recv() {
 
-                debug!("Thread {} needs to calculate {} points.", thread_id, num_points);
+            debug!("Thread {} needs to calculate {} points.", thread_id, num_points);
 
-                let mut metric = Metric::new();
-                metric.update_num_points(num_points);
+            let mut metric = Metric::new();
+            metric.update_num_points(num_points);
 
-                //let points = Points::new(&mut rng, grid_size, num_points, &cache);
-// TEST
-                let points = Points::new(&mut rng, grid_size, num_points, None);
+            let cache = cache.clone();
+            let points = Points::new(&mut rng, grid_size, num_points, cache);
 
-                let points_in_circle;
-                let cache_stats: CacheStats;
-                if ! turbo {
-                    (points_in_circle, cache_stats) = points.get_points_in_circle();
-                } else {
-                    (points_in_circle, cache_stats) = points.get_points_in_circle();
-                }
-
-                metric.update_cache_hits(cache_stats.hits);
-                metric.update_cache_misses(cache_stats.misses);
-
-                let points_not_in_circle = num_points - points_in_circle;
-                sender.send( (points_in_circle, points_not_in_circle, metric) 
-                    ).expect("Error sending response!");
-
+            let points_in_circle;
+            let cache_stats: CacheStats;
+            if ! turbo {
+                points_in_circle = points.get_points_in_circle();
+            } else {
+                points_in_circle = points.get_points_in_circle();
             }
+
+// TEST
+            //metric.update_cache_hits(cache_stats.hits);
+            //metric.update_cache_misses(cache_stats.misses);
+
+            let points_not_in_circle = num_points - points_in_circle;
+            sender.send( (points_in_circle, points_not_in_circle, metric) 
+                ).expect("Error sending response!");
+
+        }
 
     } // End of thread_spawn_core()
 
@@ -198,9 +206,7 @@ impl App {
         //
         let random_seed = self.random_seed;
         let grid_size = self.grid_size;
-        //let cache = self.cache;
-// TEST
-        let cache = false;
+        let cache = self.cache;
         let turbo = self.turbo;
 
         let handle = thread::spawn(move || {
@@ -280,7 +286,8 @@ impl App {
             debug!("MAIN THREAD RECEIVED: {:?}", result);
 
             let (points_in_circle, points_not_in_circle, metric) = result;
-            metrics.add_metric(metric);
+// TEST
+            //metrics.add_metric(metric);
 
             grid.update_num_points_in_circle(points_in_circle);
             grid.update_num_points_not_in_circle(points_not_in_circle);
