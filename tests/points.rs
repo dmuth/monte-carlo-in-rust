@@ -55,7 +55,7 @@ fn test_points_calculate_points_in_circle_with_seed() {
 
     let points = Points::new(&mut rng, grid_size, num_points, None);
 
-    let (num_points, _) = points.get_points_in_circle();
+    let num_points = points.get_points_in_circle();
     assert_eq!(num_points, 9);
 
 }
@@ -69,7 +69,7 @@ fn test_points_calculate_points_in_circle_turbo_with_seed() {
 
     let points = Points::new(&mut rng, grid_size, num_points, None);
 
-    let (num_points, _) = points.get_points_in_circle_turbo();
+    let num_points = points.get_points_in_circle_turbo();
     assert_eq!(num_points, 9);
 
 }
@@ -84,10 +84,8 @@ fn test_points_calculate_points_in_circle_with_seed_and_cache() {
     
     let points = Points::new(&mut rng, grid_size, num_points, Some(cache));
 
-    let (num_points, stats) = points.get_points_in_circle();
+    let num_points = points.get_points_in_circle();
     assert_eq!(num_points, 9);
-    assert_eq!(stats.hits, 1);
-
 
 }
 
@@ -101,9 +99,8 @@ fn test_points_calculate_points_in_circle_turbo_with_seed_and_cache() {
 
     let points = Points::new(&mut rng, grid_size, num_points, Some(cache));
 
-    let (num_points, stats) = points.get_points_in_circle_turbo();
+    let num_points = points.get_points_in_circle_turbo();
     assert_eq!(num_points, 9);
-    assert_eq!(stats.hits, 1);
 
 }
 
@@ -121,31 +118,31 @@ fn test_points_calculate_points_in_circle_manually() {
     };
 
     let points = helper(1,1);
-    let (points_in_circle, _) = points._get_points_in_circle(None);
+    let points_in_circle = points._get_points_in_circle(None);
     assert_eq!(1, points_in_circle);
 
     let points = helper(5, 5);
-    let (points_in_circle, _) = points._get_points_in_circle(None);
+    let points_in_circle = points._get_points_in_circle(None);
     assert_eq!(1, points_in_circle);
 
     let points = helper(0, 0);
-    let (points_in_circle, _) = points._get_points_in_circle(None);
+    let points_in_circle = points._get_points_in_circle(None);
     assert_eq!(1, points_in_circle);
 
     let points = helper(0, 10);
-    let (points_in_circle, _) = points._get_points_in_circle(None);
+    let points_in_circle = points._get_points_in_circle(None);
     assert_eq!(1, points_in_circle);
 
     let points = helper(10, 0);
-    let (points_in_circle, _) = points._get_points_in_circle(None);
+    let points_in_circle = points._get_points_in_circle(None);
     assert_eq!(1, points_in_circle);
 
     let points = helper(10, 1);
-    let (points_in_circle, _) = points._get_points_in_circle(None);
+    let points_in_circle = points._get_points_in_circle(None);
     assert_eq!(0, points_in_circle);
 
     let points = helper(1, 10);
-    let (points_in_circle, _) = points._get_points_in_circle(None);
+    let points_in_circle = points._get_points_in_circle(None);
     assert_eq!(0, points_in_circle);
 
 } 
@@ -164,31 +161,31 @@ fn test_points_calculate_points_in_circle_manually_turbo() {
     };
 
     let points = helper(1,1);
-    let (points_in_circle, _) = points._get_points_in_circle(Some(CircleMode::Turbo));
+    let points_in_circle = points._get_points_in_circle(Some(CircleMode::Turbo));
     assert_eq!(1, points_in_circle);
 
     let points = helper(5, 5);
-    let (points_in_circle, _) = points._get_points_in_circle(Some(CircleMode::Turbo));
+    let points_in_circle = points._get_points_in_circle(Some(CircleMode::Turbo));
     assert_eq!(1, points_in_circle);
 
     let points = helper(0, 0);
-    let (points_in_circle, _) = points._get_points_in_circle(Some(CircleMode::Turbo));
+    let points_in_circle = points._get_points_in_circle(Some(CircleMode::Turbo));
     assert_eq!(1, points_in_circle);
 
     let points = helper(0, 10);
-    let (points_in_circle, _) = points._get_points_in_circle(Some(CircleMode::Turbo));
+    let points_in_circle = points._get_points_in_circle(Some(CircleMode::Turbo));
     assert_eq!(1, points_in_circle);
 
     let points = helper(10, 0);
-    let (points_in_circle, _) = points._get_points_in_circle(Some(CircleMode::Turbo));
+    let points_in_circle = points._get_points_in_circle(Some(CircleMode::Turbo));
     assert_eq!(1, points_in_circle);
 
     let points = helper(10, 1);
-    let (points_in_circle, _) = points._get_points_in_circle(Some(CircleMode::Turbo));
+    let points_in_circle = points._get_points_in_circle(Some(CircleMode::Turbo));
     assert_eq!(0, points_in_circle);
 
     let points = helper(1, 10);
-    let (points_in_circle, _) = points._get_points_in_circle(Some(CircleMode::Turbo));
+    let points_in_circle = points._get_points_in_circle(Some(CircleMode::Turbo));
     assert_eq!(0, points_in_circle);
 
 } 

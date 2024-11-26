@@ -115,7 +115,7 @@ impl Points {
     /*
     * Our core function to get the number of points inside our circle.
     */
-    pub fn _get_points_in_circle(mut self: Points, mode:Option<CircleMode>) -> (u64, CacheStats) {
+    pub fn _get_points_in_circle(mut self: Points, mode:Option<CircleMode>) -> u64 {
 
         let mut num_points = 0;
         let r_squared = self.grid_size.pow(2);
@@ -166,9 +166,7 @@ impl Points {
 
         }
 
-        let stats = self.get_cache_stats();
-
-        (num_points, stats)
+        num_points
 
     } // End of _get_points_in_circle()
 
@@ -176,11 +174,11 @@ impl Points {
     /*
     * Count the number of points in a circle.
     */
-    pub fn get_points_in_circle(self: Points) -> (u64, CacheStats) {
+    pub fn get_points_in_circle(self: Points) -> u64 {
         self._get_points_in_circle(None)
     }
 
-    pub fn get_points_in_circle_turbo(self: Points) -> (u64, CacheStats) {
+    pub fn get_points_in_circle_turbo(self: Points) -> u64 {
         self._get_points_in_circle(Some(CircleMode::Turbo))
     }   
 
