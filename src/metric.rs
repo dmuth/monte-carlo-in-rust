@@ -1,3 +1,10 @@
+//
+// THIS FILE IS DEPRECATED.
+//
+// While it seemed like a good idea at the time, having some values be 
+// updated per loop and others updated once per function just made abstracting
+// more effort than it was worth.
+//
 
 // Debugging
 //#![cfg_attr(debug_assertions, allow(dead_code, unused_imports, unused_variables))]
@@ -44,6 +51,7 @@ impl Metric {
     * Update our runtime and return the metric.
     */
     pub fn get_metric(mut self: Metric) -> Metric {
+
 
         self.runtime = Some(self.timer.get_elapsed());
 
