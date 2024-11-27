@@ -193,14 +193,15 @@ impl App {
                     points_not_in_circle: points_not_in_circle,
                     runtime: runtime,
                     }
-                ).expect("Error sending response!");
+                ).expect("Error sending results from child thread!");
 
         }
 
         match cache {
             Some(cache) => {
                 let cache_stats = cache.borrow().get_stats();
-                sender.send(ResultMessage::FinalMessage(cache_stats));
+                sender.send(ResultMessage::FinalMessage(cache_stats)
+                    ).expect("Error sending cache results from child thread!");
             },
             _ => {}
         }
@@ -313,7 +314,6 @@ impl App {
                     metrics.runtime += runtime;
                 },
                 ResultMessage::FinalMessage(cache_stats) => {
-                    println!("TEST CACHE STATS: {:?}", cache_stats);
                     metrics.cache_hits += cache_stats.hits;
                     metrics.cache_misses += cache_stats.misses;
                 }
