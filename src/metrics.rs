@@ -15,7 +15,7 @@ use serde::Serializer;
 #[derive(Debug, Serialize)]
 pub struct Metrics {
     #[serde(serialize_with = "serialize_duration")]
-    pub runtime: Option<Duration>,
+    pub runtime: Duration,
     grid_size: u64,
     pub num_points: u64,
     pub num_metrics: u64,
@@ -27,19 +27,11 @@ pub struct Metrics {
 /*
 * Function to serialize our duration, by turning it from a Duration into a string.
 */
-fn serialize_duration<S>(duration: &Option<Duration>, serializer: S
+fn serialize_duration<S>(duration: &Duration, serializer: S
     ) -> Result<S::Ok, S::Error> where S: Serializer {
 
-    match duration {
-
-        Some(duration) => {
-            let secs = duration.as_secs() as f64 + duration.subsec_nanos() as f64 * 1e-9;
-            serializer.serialize_f64(secs)
-        }
-
-        None => serializer.serialize_none(), // Serialize as null
-
-    }
+    let secs = duration.as_secs() as f64 + duration.subsec_nanos() as f64 * 1e-9;
+    serializer.serialize_f64(secs)
 
 }
 
@@ -49,7 +41,7 @@ impl Metrics {
     pub fn new(grid_size: u64) -> Self {
 
         let metrics = Metrics {
-            runtime: None,
+            runtime: Duration::ZERO,
             grid_size: grid_size, 
             num_points: 0,
             num_metrics: 0,

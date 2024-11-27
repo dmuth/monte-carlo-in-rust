@@ -8,6 +8,7 @@ use std::rc::Rc;
 use std::sync::Arc;
 use std::thread;
 use std::thread::JoinHandle;
+use std::time::Duration;
 
 use crossbeam::channel::{self, Sender, Receiver};
 use log::{info, debug};
@@ -15,13 +16,10 @@ use log::{info, debug};
 use crate::cache::{Cache, CacheStats};
 use crate::grid::Grid;
 use crate::points::Points;
-use crate::metric::Metric;
 use crate::metrics::Metrics;
 use crate::random::Random;
 use crate::timer::Timer;
 
-
-type ResultMessage = (u64, u64, Metric);
 
 /*
 * Our structure.
@@ -35,6 +33,13 @@ pub struct App {
     cache: bool,
     turbo: bool,
     random_seed: Option<u64>,
+}
+
+#[derive(Debug)]
+enum ResultMessage {
+    LoopMessage { num_points: u64, points_in_circle: u64, points_not_in_circle: u64, runtime: Duration },
+    //LoopMessage(u64, u64, u64, Duration),
+    FinalMessage(CacheStats),
 }
 
 
@@ -125,11 +130,16 @@ impl App {
 
         }
 
-        let cache_stats = cache.unwrap().borrow().get_stats();
+        match self.cache {
+            true => {
+                let cache_stats = cache.unwrap().borrow().get_stats();
+                metrics.cache_hits = cache_stats.hits;
+                metrics.cache_misses = cache_stats.misses;
+            },
+            _ => {}
+        }
 
-        metrics.cache_hits = cache_stats.hits;
-        metrics.cache_misses = cache_stats.misses;
-        metrics.runtime = Some(timer.get_elapsed());
+        metrics.runtime = timer.get_elapsed();
 
         let pi = grid.calculate_pi().unwrap();
 
@@ -160,30 +170,39 @@ impl App {
 
         while let Ok(num_points) = receiver.recv() {
 
+            let mut timer = Timer::new();
             debug!("Thread {} needs to calculate {} points.", thread_id, num_points);
-
-            let mut metric = Metric::new();
-            metric.update_num_points(num_points);
 
             let cache = cache.clone();
             let points = Points::new(&mut rng, grid_size, num_points, cache);
 
             let points_in_circle;
-            let cache_stats: CacheStats;
             if ! turbo {
                 points_in_circle = points.get_points_in_circle();
             } else {
-                points_in_circle = points.get_points_in_circle();
+                points_in_circle = points.get_points_in_circle_turbo();
             }
 
-// TEST
-            //metric.update_cache_hits(cache_stats.hits);
-            //metric.update_cache_misses(cache_stats.misses);
-
             let points_not_in_circle = num_points - points_in_circle;
-            sender.send( (points_in_circle, points_not_in_circle, metric) 
+            let runtime = timer.get_elapsed();
+
+            sender.send(
+                ResultMessage::LoopMessage { 
+                    num_points: num_points,
+                    points_in_circle: points_in_circle,
+                    points_not_in_circle: points_not_in_circle,
+                    runtime: runtime,
+                    }
                 ).expect("Error sending response!");
 
+        }
+
+        match cache {
+            Some(cache) => {
+                let cache_stats = cache.borrow().get_stats();
+                sender.send(ResultMessage::FinalMessage(cache_stats));
+            },
+            _ => {}
         }
 
     } // End of thread_spawn_core()
@@ -285,12 +304,20 @@ impl App {
 
             debug!("MAIN THREAD RECEIVED: {:?}", result);
 
-            let (points_in_circle, points_not_in_circle, metric) = result;
-// TEST
-            //metrics.add_metric(metric);
-
-            grid.update_num_points_in_circle(points_in_circle);
-            grid.update_num_points_not_in_circle(points_not_in_circle);
+            match result {
+                ResultMessage::LoopMessage{num_points, points_in_circle, points_not_in_circle, runtime} => {
+                    grid.update_num_points_in_circle(points_in_circle);
+                    grid.update_num_points_not_in_circle(points_not_in_circle);
+                    metrics.num_metrics += 1;
+                    metrics.num_points += num_points;
+                    metrics.runtime += runtime;
+                },
+                ResultMessage::FinalMessage(cache_stats) => {
+                    println!("TEST CACHE STATS: {:?}", cache_stats);
+                    metrics.cache_hits += cache_stats.hits;
+                    metrics.cache_misses += cache_stats.misses;
+                }
+            }
 
         }
 

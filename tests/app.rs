@@ -38,7 +38,7 @@ fn test_app_cache() {
     assert_eq!(metrics.cache_misses, 121);
 
     let num_points = 1001;
-    let app = App::new(grid_size, num_points, num_threads, batch_size, cache, false, random_seed);
+    let app = App::new(grid_size, num_points, num_threads, batch_size, cache, true, random_seed);
     let (pi, metrics) = app.go();
     assert_eq!(pi, 2.909090909090909);
     assert_eq!(metrics.cache_hits, 880);
@@ -65,14 +65,35 @@ fn test_app_turbo() {
 }
 
 #[test]
+fn test_app_multithreading_cache() {
+
+    let grid_size = 10;
+    let num_points = 1000;
+    let num_threads = 2;
+    let batch_size = 100;
+    let cache = true;
+    let turbo = false;
+    let random_seed = Some(12345);
+    let app = App::new(grid_size, num_points, num_threads, batch_size, cache, turbo, random_seed);
+
+    let (pi, metrics) = app.go();
+    assert_eq!(pi, 2.968);
+    assert_eq!(metrics.cache_hits, 758);
+    assert_eq!(metrics.cache_misses, 242);
+
+}
+
+#[test]
 fn test_app_multithreading() {
 
     let grid_size = 10;
     let num_points = 1000;
     let num_threads = 2;
     let batch_size = 100;
+    let cache = false;
+    let turbo = false;
     let random_seed = Some(12345);
-    let app = App::new(grid_size, num_points, num_threads, batch_size, false, false, random_seed);
+    let app = App::new(grid_size, num_points, num_threads, batch_size, cache, turbo, random_seed);
 
     let (pi, metrics) = app.go();
     assert_eq!(pi, 2.968);

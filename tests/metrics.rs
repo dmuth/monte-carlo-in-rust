@@ -19,9 +19,8 @@ fn test_metrics() {
     assert_eq!(metrics.cache_hits, 123);
     assert_eq!(metrics.cache_misses, 456);
 
-    metrics.runtime = Some(timer.get_elapsed());
-    metrics.runtime = Some( timer.get_elapsed() + metrics.runtime.unwrap() );
-    assert!(metrics.runtime.is_some(), "Expected value of runtime to set");
+    metrics.runtime = timer.get_elapsed();
+    metrics.runtime = timer.get_elapsed() + metrics.runtime;
 
     metrics.num_metrics += 1;
     metrics.cache_hits += 123;
