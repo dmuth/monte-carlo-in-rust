@@ -55,7 +55,7 @@ fn main() {
         "random_seed": random_seed,
         "turbo": turbo,
         "metrics": 
-            serde_json::to_string(&metrics).expect("Unable to serialize metrics")
+            metrics
         });
 
     info!("Metrics: {:?}", metrics);
