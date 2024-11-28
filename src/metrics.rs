@@ -16,6 +16,8 @@ use serde::Serializer;
 pub struct Metrics {
     #[serde(serialize_with = "serialize_duration")]
     pub runtime: Duration,
+    #[serde(serialize_with = "serialize_duration")]
+    pub wallclock: Duration,
     grid_size: u64,
     pub num_points: u64,
     pub num_metrics: u64,
@@ -43,6 +45,7 @@ impl Metrics {
 
         let metrics = Metrics {
             runtime: Duration::ZERO,
+            wallclock: Duration::ZERO,
             grid_size: grid_size, 
             num_points: 0,
             num_metrics: 0,

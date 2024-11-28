@@ -38,13 +38,12 @@ pub struct App {
 #[derive(Debug)]
 enum ResultMessage {
     LoopMessage { num_points: u64, points_in_circle: u64, points_not_in_circle: u64, runtime: Duration },
-    //LoopMessage(u64, u64, u64, Duration),
     FinalMessage(CacheStats),
 }
 
 
 /*
-* Our custom formatted since we can't print out the random value.
+* Our custom formatter since we can't easily print out options.
 */
 impl fmt::Debug for App {
 
@@ -90,6 +89,7 @@ impl App {
     fn go_single_thread(&mut self) -> (f64, Metrics) {
 
         let mut timer = Timer::new();
+        let mut wallclock = Timer::new();
         let mut grid = Grid::new(self.grid_size);
         let mut metrics = Metrics::new(self.grid_size);
 
@@ -140,6 +140,7 @@ impl App {
         }
 
         metrics.runtime = timer.get_elapsed();
+        metrics.wallclock = wallclock.get_elapsed();
 
         let pi = grid.calculate_pi().unwrap();
 
@@ -271,6 +272,7 @@ impl App {
         let (task_sender, task_receiver): (Sender<u64>, Receiver<u64>) = channel::unbounded();
         let (result_sender, result_receiver): (
             Sender< ResultMessage >, Receiver< ResultMessage >) = channel::unbounded();
+        let mut wallclock = Timer::new();
 
         // Spin up our threads
         let handles = self.thread_spawn_all(task_receiver, result_sender, num_threads);
@@ -329,6 +331,7 @@ impl App {
 
         info!("Done reading results from threads!");
 
+        metrics.wallclock = wallclock.get_elapsed();
         let pi = grid.calculate_pi().unwrap();
         return (pi, metrics);
 

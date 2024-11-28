@@ -22,7 +22,7 @@ pub struct Args {
         help = "How many random numbers to generate per function invocation?")]
     pub batch_size: u64,
 
-    #[arg(long, default_value_t = 1, help = "How many threads to use for computation?")]
+    #[arg(short, long, default_value_t = 1, help = "How many threads to use for computation?")]
     pub num_threads: u64,
 
     #[arg(short, long, default_value_t = false,
