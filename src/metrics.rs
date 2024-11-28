@@ -26,6 +26,7 @@ pub struct Metrics {
 
 /*
 * Function to serialize our duration, by turning it from a Duration into a string.
+* This is used when outputting data and/or JSON encoding.
 */
 fn serialize_duration<S>(duration: &Duration, serializer: S
     ) -> Result<S::Ok, S::Error> where S: Serializer {
