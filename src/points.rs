@@ -10,8 +10,6 @@
 use std::rc::Rc;
 use std::cell::RefCell;
 
-use log::{info};
-
 use crate::random::Random;
 use crate::point::Point;
 use crate::cache::{Cache, CacheStats, CacheState};
@@ -119,13 +117,6 @@ impl Points {
 
         let mut num_points = 0;
         let r_squared = self.grid_size.pow(2);
-
-        match mode {
-            Some(CircleMode::Turbo) => { 
-                info!("Setting turbo mode for circle analysis!");
-            },
-            _ => {}
-        }
 
         for point in &self.points {
 
