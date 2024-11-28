@@ -1,15 +1,10 @@
 
 
-// Debugging for development
-#![cfg_attr(debug_assertions, allow(dead_code, unused_imports, unused_variables))]
+//#![allow(unused_imports)]
+
 
 //use log::{info, warn, error, debug, trace};
 use log::{info};
-
-use std::thread::sleep;
-use std::time::Instant;
-use std::time::Duration;
-use std::collections::HashMap;
 
 use env_logger::{Builder, Env};
 use serde_json::json;
@@ -26,11 +21,6 @@ mod random;
 mod timer;
 
 use app::App;
-use grid::Grid;
-use points::{Points};
-use random::Random;
-use timer::Timer;
-
 
 
 fn main() {
@@ -48,7 +38,8 @@ fn main() {
     let num_points = 1000;
     let num_threads = 2;
     let batch_size = 100;
-    let random_seed = Some(12345);
+    //let random_seed = Some(12345);
+    let random_seed = None;
     let turbo = false;
     let cache = false;
     let app = App::new(grid_size, num_points, num_threads, batch_size, cache, turbo, random_seed);

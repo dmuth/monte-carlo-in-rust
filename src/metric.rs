@@ -7,7 +7,7 @@
 //
 
 // Debugging
-//#![cfg_attr(debug_assertions, allow(dead_code, unused_imports, unused_variables))]
+#![cfg_attr(debug_assertions, allow(dead_code, unused_imports, unused_variables))]
 
 
 use std::time::Duration;
