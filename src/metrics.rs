@@ -23,6 +23,7 @@ pub struct Metrics {
     pub num_metrics: u64,
     pub cache_hits: u64,
     pub cache_misses: u64,
+    pub cache_hit_rate: f64,
 }
 
 
@@ -51,6 +52,7 @@ impl Metrics {
             num_metrics: 0,
             cache_hits: 0,
             cache_misses: 0,
+            cache_hit_rate: 0.0,
             };
 
         metrics

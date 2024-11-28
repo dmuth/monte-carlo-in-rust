@@ -135,6 +135,8 @@ impl App {
                 let cache_stats = cache.unwrap().borrow().get_stats();
                 metrics.cache_hits = cache_stats.hits;
                 metrics.cache_misses = cache_stats.misses;
+                metrics.cache_hit_rate = metrics.cache_hits as f64 
+                    / (metrics.cache_hits as f64 + metrics.cache_misses as f64) * 100.0;
             },
             _ => {}
         }
@@ -318,6 +320,8 @@ impl App {
                 ResultMessage::FinalMessage(cache_stats) => {
                     metrics.cache_hits += cache_stats.hits;
                     metrics.cache_misses += cache_stats.misses;
+                    metrics.cache_hit_rate = metrics.cache_hits as f64 
+                        / (metrics.cache_hits as f64 + metrics.cache_misses as f64) * 100.0;
                 }
             }
 
