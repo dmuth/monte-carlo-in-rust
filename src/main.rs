@@ -34,14 +34,14 @@ fn main() {
     info!("Args: {:?}", args);
     //sleep(Duration::from_millis(100));
 
-    let grid_size = 10;
-    let num_points = 1000;
-    let num_threads = 2;
-    let batch_size = 100;
+    let grid_size = args.grid_size;
+    let num_points = args.count;
+    let num_threads = args.num_threads;
+    let batch_size = args.batch_size;
     //let random_seed = Some(12345);
-    let random_seed = None;
-    let turbo = false;
-    let cache = false;
+    let random_seed = args.random_seed;
+    let turbo = args.turbo;
+    let cache = args.cache;
     let app = App::new(grid_size, num_points, num_threads, batch_size, cache, turbo, random_seed);
 
     let (pi, metrics) = app.go();
@@ -58,10 +58,13 @@ fn main() {
             serde_json::to_string(&metrics).expect("Unable to serialize metrics")
         });
 
+    info!("Metrics: {:?}", metrics);
 
-    println!("Pi: {:?}", pi);
-    println!("Metrics: {:?}", metrics);
-    println!("JSON: {}", data.to_string() );
+    if args.metrics {
+        println!("{}", data.to_string() );
+    } else {
+        println!("{:?}", pi);
+    }
 
 } // End of main()
 
