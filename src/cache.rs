@@ -9,7 +9,6 @@ use crate::point::Point;
 /*
 * Our cache
 */
-//#[derive(Debug, Clone)]
 #[derive(Debug)]
 pub struct Cache {
     pub grid_size: u64,
