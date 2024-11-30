@@ -9,6 +9,8 @@ me to find hosting or use external data sources.
 
 ## How it works
 
+<img src="img/quadrant.png" width="300" align="right" />
+
 This app uses a simplification of the Monte Carlo method by just working with a 
 quarter of a circle.  This allows me to keep all integers unsigned which makes the code
 easier to work with (and debug).  
@@ -22,7 +24,6 @@ From there, a number of random points (default 100) are generated, each point is
 if it is in the circle (using the Pythagorean Theorem), and at the end the number of points 
 in the circle are divided into the total number of points and multiplied by four.  This gives
 us an approximation of Pi.
-
 
 ## Architecture
 
