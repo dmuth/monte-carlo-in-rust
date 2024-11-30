@@ -40,6 +40,10 @@ pub struct Args {
         help = "Set if you want to use caching for circle calculations.")]
     pub cache: bool,
 
+    #[arg(long, default_value_t = false, 
+        help = "Benchmark mode.  This will print how many points per second were plotted.")]
+    pub benchmark: bool,
+
 }
 
 

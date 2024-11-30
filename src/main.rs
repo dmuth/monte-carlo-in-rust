@@ -61,10 +61,22 @@ fn main() {
     info!("Metrics: {:?}", metrics);
 
     if args.metrics {
+        info!("--metrics specified, so we're printing metrics.");
         println!("{}", data.to_string() );
+
     } else {
-        println!("{:?}", pi);
+        if args.benchmark {
+            info!("--benchmark specified, so we're printing a benchmark!");
+            let speed = metrics.num_points as f64 / metrics.wallclock.as_secs_f64();
+            println!("{:.3}", speed);
+
+        } else {
+            println!("{:?}", pi);
+
+        }
+
     }
+
 
 } // End of main()
 
