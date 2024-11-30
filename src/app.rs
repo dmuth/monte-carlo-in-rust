@@ -38,7 +38,7 @@ pub struct App {
 #[derive(Debug)]
 enum ResultMessage {
     LoopMessage { num_points: u64, points_in_circle: u64, points_not_in_circle: u64, runtime: Duration },
-    FinalMessage(CacheStats),
+    CacheStatsMessage(CacheStats),
 }
 
 
@@ -203,7 +203,7 @@ impl App {
         match cache {
             Some(cache) => {
                 let cache_stats = cache.borrow().get_stats();
-                sender.send(ResultMessage::FinalMessage(cache_stats)
+                sender.send(ResultMessage::CacheStatsMessage(cache_stats)
                     ).expect("Error sending cache results from child thread!");
             },
             _ => {}
@@ -317,7 +317,7 @@ impl App {
                     metrics.num_points += num_points;
                     metrics.runtime += runtime;
                 },
-                ResultMessage::FinalMessage(cache_stats) => {
+                ResultMessage::CacheStatsMessage(cache_stats) => {
                     metrics.cache_hits += cache_stats.hits;
                     metrics.cache_misses += cache_stats.misses;
                     metrics.cache_hit_rate = metrics.cache_hits as f64 
