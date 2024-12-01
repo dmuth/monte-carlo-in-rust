@@ -19,6 +19,7 @@ pub use points::CircleMode;
 
 mod app;
 pub use app::App;
+pub use app::Progress;
 
 mod cache;
 pub use cache::Cache;

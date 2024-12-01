@@ -2,6 +2,7 @@
 use std::ops::Sub;
 
 use monte_carlo::App;
+use monte_carlo::Progress;
 
 
 /*
@@ -210,4 +211,36 @@ fn test_app_get_batch_count() {
     assert_eq!(app.get_batch_count(), 0);
 
 }
+
+
+#[test]
+fn test_app_progress() {
+
+    let num_points = 100;
+    let mut progress = Progress::new(num_points);
+    assert_eq!(progress.get_percent(1), 1);
+    assert_eq!(progress.get_percent(5), 5);
+    assert_eq!(progress.display(1), true);
+    assert_eq!(progress.display(1), false);
+    assert_eq!(progress.display(1), false);
+    assert_eq!(progress.display(5), true);
+    assert_eq!(progress.display(5), false);
+
+    let num_points = 1000;
+    let mut progress = Progress::new(num_points);
+    assert_eq!(progress.get_percent(1), 0);
+    assert_eq!(progress.get_percent(5), 0);
+    assert_eq!(progress.get_percent(10), 1);
+    assert_eq!(progress.get_percent(10), 1);
+    assert_eq!(progress.get_percent(20), 2);
+    assert_eq!(progress.get_percent(21), 2);
+    assert_eq!(progress.display(1), false);
+    assert_eq!(progress.display(5), false);
+    assert_eq!(progress.display(10), true);
+    assert_eq!(progress.display(11), false);
+    assert_eq!(progress.display(21), true);
+    assert_eq!(progress.display(21), false);
+
+}
+
 
