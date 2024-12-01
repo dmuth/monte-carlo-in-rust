@@ -8,6 +8,8 @@ use log::{info};
 
 use env_logger::{Builder, Env};
 use serde_json::json;
+use statrs::statistics::Statistics;
+
 
 mod args;
 mod app;
@@ -42,43 +44,96 @@ fn main() {
     let random_seed = args.random_seed;
     let turbo = args.turbo;
     let cache = args.cache;
-    let app = App::new(grid_size, num_points, num_threads, batch_size, cache, turbo, random_seed);
 
-    let (pi, metrics) = app.go();
+    if args.avg_multiple_runs == 0 {
 
-    let data = json!({
-        "pi": pi,
-        "grid_size": grid_size,
-        "num_points": num_points,
-        "num_threads": num_threads,
-        "batch_size": batch_size,
-        "random_seed": random_seed,
-        "turbo": turbo,
-        "metrics": 
-            metrics
-        });
+        let app = App::new(grid_size, num_points, num_threads, batch_size, cache, turbo, random_seed);
 
-    info!("Metrics: {:?}", metrics);
+        let (pi, metrics) = app.go();
 
-    if args.metrics {
-        info!("--metrics specified, so we're printing metrics.");
-        println!("{}", data.to_string() );
+        let data = json!({
+            "pi": pi,
+            "grid_size": grid_size,
+            "num_points": num_points,
+            "num_threads": num_threads,
+            "batch_size": batch_size,
+            "random_seed": random_seed,
+            "turbo": turbo,
+            "metrics": 
+                metrics
+            });
 
-    } else {
-        if args.benchmark {
-            info!("--benchmark specified, so we're printing a benchmark!");
-            let speed = metrics.num_points as f64 / metrics.wallclock.as_secs_f64();
-            println!("{:.3}", speed);
+        info!("Metrics: {:?}", metrics);
+
+        if args.metrics {
+            info!("--metrics specified, so we're printing metrics.");
+            println!("{}", data.to_string() );
 
         } else {
-            println!("{:?}", pi);
+            if args.benchmark {
+                info!("--benchmark specified, so we're printing a benchmark!");
+                let speed = metrics.num_points as f64 / metrics.wallclock.as_secs_f64();
+                println!("{:.3}", speed);
+
+            } else {
+                println!("{:?}", pi);
+
+            }
 
         }
+
+    } else {
+        info!("Doing {:?} runs and averaging the result..", args.avg_multiple_runs);
+
+        let mut values = Vec::<f64>::new();
+        let mut min_decimal_places = u8::MAX;
+
+        for i in 1..=args.avg_multiple_runs {
+            info!("Beginning run {:?}/{:?}", i, args.avg_multiple_runs);
+
+            let app = App::new(grid_size, num_points, num_threads, batch_size, cache, turbo, random_seed);
+            let (pi, _) = app.go();
+            values.push(pi);
+
+            let decimal_places = get_decimal_places(pi);
+            if decimal_places < min_decimal_places {
+                min_decimal_places = decimal_places;
+            }
+
+        }
+
+        let mean = values.clone().mean();
+        let std_dev = values.clone().std_dev();
+        info!("Pi values: {:?}", values);
+        info!("Mean: {:?}, std_dev: {:?}, min_decimal_places: {:?}", 
+            mean, std_dev, min_decimal_places);
+        println!("{:.1$}", mean, min_decimal_places as usize);
 
     }
 
 
 } // End of main()
 
+
+/*
+* Get the number of decimal places in a float.
+*/
+fn get_decimal_places(num: f64) -> u8 {
+
+    //
+    // Turn into a string with many decimal places and then 
+    // find the index of the decimal.
+    //
+    let value_str = format!("{}", num);
+    let pos = value_str.find(".");
+
+    match pos {
+        Some(pos) => {
+            value_str[pos + 1..].len() as u8
+        },
+        None => { 0 }
+    }
+
+}
 
 

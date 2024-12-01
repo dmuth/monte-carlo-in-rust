@@ -29,9 +29,6 @@ pub struct Args {
          help = "Set if you want metrics printed out in JSON format.")]
     pub metrics: bool,
 
-    #[arg(short, long, help = "ADVANCED: Seed the random number generator for deterministic behavior.")]
-    pub random_seed: Option<u64>,
-
     #[arg(short, long, default_value_t = false, 
         help = "Set to use \"turbo\" mode where a simplified version of the Pythaogrean Theorem is used.")]
     pub turbo: bool,
@@ -43,6 +40,13 @@ pub struct Args {
     #[arg(long, default_value_t = false, 
         help = "Benchmark mode.  This will print how many points per second were plotted.")]
     pub benchmark: bool,
+
+    #[arg(short, long, default_value_t = 0,
+        help = "Perform multiple runs and average the values of Pi from all runs.")]
+    pub avg_multiple_runs: u64,
+
+    #[arg(short, long, help = "ADVANCED: Seed the random number generator for deterministic behavior.")]
+    pub random_seed: Option<u64>,
 
 }
 
