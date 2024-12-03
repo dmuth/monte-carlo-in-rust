@@ -107,7 +107,33 @@ impl Cache {
     }
 
 
-} // End of Cache
+    /*
+    * Pre-compute all values in our cache.
+    */
+    pub fn precompute(&mut self) {
 
+        let r_squared = self.grid_size.pow(2);
+
+        for x in 0..self.data.len() {
+            for y in 0..self.data[x].len() {
+                //
+                // Technically, I am duplicating code from the Points struct, but I feel
+                // this made more sense than splitting that out into a separate function that 
+                // would be called statically from this one.
+                //
+                let mut val = CacheState::False;
+                let total = x.pow(2) as u64 + y.pow(2) as u64;
+                if total <= r_squared {
+                    val = CacheState::True;
+                }
+
+                self.data[x][y] = val;
+
+            }
+        }
+
+    }
+
+} // End of Cache
 
 
