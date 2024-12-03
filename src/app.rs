@@ -102,9 +102,11 @@ impl App {
             true => {
                 cache = Some(Rc::new(RefCell::new(Cache::new(self.grid_size))));
                 if self.cache_precompute {
+                    let mut timer = Timer::new();
                     info!("Precomputing cache...");
                     cache.as_mut().unwrap().borrow_mut().precompute();
-                    info!("Done precomputing cache!");
+                    let elapsed = timer.get_elapsed();
+                    info!("Done precomputing cache! ({} points in {:?})", self.grid_size.pow(2), elapsed);
                 }
             },
             _ => {}
