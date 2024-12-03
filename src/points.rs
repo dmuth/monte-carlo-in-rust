@@ -12,7 +12,7 @@ use std::cell::RefCell;
 
 use crate::random::Random;
 use crate::point::Point;
-use crate::cache::{Cache, CacheStats, CacheState};
+use crate::cache::{Cache, CacheStats};
 
 
 pub enum CircleMode {
@@ -127,8 +127,8 @@ impl Points {
             match self.cache {
                 Some(ref mut cache) => {
                     if cache.borrow_mut().has(*point) {
-                        match cache.borrow().get(*point) {
-                            CacheState::True => {
+                        match cache.borrow_mut().get(*point) {
+                            true => {
                                 num_points += 1;
                             },
                             _ => {},
@@ -146,13 +146,14 @@ impl Points {
 
             if in_circle {
                 num_points += 1;
-                if let Some(ref mut cache) = self.cache {
-                    cache.borrow_mut().set(*point, CacheState::True);
-                }
+// TESt
+//                if let Some(ref mut cache) = self.cache {
+//                    cache.borrow_mut().set(*point, CacheState::True);
+//                }
             } else {
-                if let Some(ref mut cache) = self.cache {
-                    cache.borrow_mut().set(*point, CacheState::False);
-                }
+//                if let Some(ref mut cache) = self.cache {
+//                    cache.borrow_mut().set(*point, CacheState::False);
+//                }
             }
 
         }

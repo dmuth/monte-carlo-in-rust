@@ -4,11 +4,10 @@ use std::cell::RefCell;
 
 use monte_carlo::Point;
 use monte_carlo::Cache;
-use monte_carlo::CacheState;
 
 
 #[test]
-fn test_cache_get_set_has() {
+fn test_cache_get() {
 
     let grid_size = 5;
     let cache = Rc::new(RefCell::new(Cache::new(grid_size)));
@@ -18,26 +17,43 @@ fn test_cache_get_set_has() {
 
     let point = Point{x:1, y:2};
 
-    assert_eq!(cache.borrow().get(point), CacheState::Unknown);
     assert_eq!(cache.borrow_mut().has(point), false);
-
-    cache.borrow_mut().set(point, CacheState::True);
-    assert_eq!(cache.borrow().get(point), CacheState::True);
-    assert_eq!(cache.borrow_mut().has(point), true);
-
-    cache.borrow_mut().set(point, CacheState::False);
-    assert_eq!(cache.borrow().get(point), CacheState::False);
-    assert_eq!(cache.borrow_mut().has(point), true);
-
     let stats = cache.borrow().get_stats();
-    assert_eq!( (stats.hits, stats.misses), (2, 1));
+    assert_eq!( (stats.hits, stats.misses), (0, 1));
 
-    let point = Point{x:3, y:4};
-    assert_eq!(cache.borrow().get(point), CacheState::Unknown);
-    assert_eq!(cache.borrow_mut().has(point), false);
+    assert_eq!(cache.borrow_mut().get(point), true);
+    let stats = cache.borrow().get_stats();
+    assert_eq!( (stats.hits, stats.misses), (0, 2));
 
+    assert_eq!(cache.borrow_mut().has(point), true);
+    let stats = cache.borrow().get_stats();
+    assert_eq!( (stats.hits, stats.misses), (1, 2));
+
+    assert_eq!(cache.borrow_mut().get(point), true);
     let stats = cache.borrow().get_stats();
     assert_eq!( (stats.hits, stats.misses), (2, 2));
+
+    let point = Point{x:3, y:4};
+    assert_eq!(cache.borrow_mut().has(point), false);
+    let stats = cache.borrow().get_stats();
+    assert_eq!( (stats.hits, stats.misses), (2, 3));
+
+    assert_eq!(cache.borrow_mut().get(point), true);
+    let stats = cache.borrow().get_stats();
+    assert_eq!( (stats.hits, stats.misses), (2, 4));
+
+    assert_eq!(cache.borrow_mut().get(point), true);
+    let stats = cache.borrow().get_stats();
+    assert_eq!( (stats.hits, stats.misses), (3, 4));
+
+    let point = Point{x:5, y:5};
+    assert_eq!(cache.borrow_mut().get(point), false);
+    let stats = cache.borrow().get_stats();
+    assert_eq!( (stats.hits, stats.misses), (3, 5));
+
+    assert_eq!(cache.borrow_mut().get(point), false);
+    let stats = cache.borrow().get_stats();
+    assert_eq!( (stats.hits, stats.misses), (4, 5));
 
 }
 
@@ -54,22 +70,26 @@ fn test_cache_precompute() {
 
     let point = Point{x:1, y:2};
 
-    assert_eq!(cache.borrow().get(point), CacheState::True);
+    assert_eq!(cache.borrow_mut().get(point), true);
     assert_eq!(cache.borrow_mut().has(point), true);
 
     let stats = cache.borrow().get_stats();
     assert_eq!( (stats.hits, stats.misses), (1, 0));
 
     let point = Point{x:3, y:4};
-    assert_eq!(cache.borrow().get(point), CacheState::True);
+    assert_eq!(cache.borrow_mut().get(point), true);
     assert_eq!(cache.borrow_mut().has(point), true);
 
     let point = Point{x:grid_size, y:grid_size};
-    assert_eq!(cache.borrow().get(point), CacheState::False);
+    assert_eq!(cache.borrow_mut().get(point), true);
     assert_eq!(cache.borrow_mut().has(point), true);
 
     let stats = cache.borrow().get_stats();
     assert_eq!( (stats.hits, stats.misses), (3, 0));
+
+    let grid_size = 10;
+    let cache = Rc::new(RefCell::new(Cache::new(grid_size)));
+    cache.borrow_mut().precompute();
 
 }
 

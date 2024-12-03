@@ -12,7 +12,8 @@ use crate::point::Point;
 #[derive(Debug)]
 pub struct Cache {
     pub grid_size: u64,
-    data: Vec<Vec<CacheState>>,
+    r_squared: u64,
+    data: Vec<YIntercept>,
     hits: u64,
     misses: u64,
 }
@@ -25,9 +26,16 @@ pub struct Cache {
 pub enum CacheState {
     True,
     False,
-    Unknown,
 }
 
+/*
+* Y-intercept values.
+*/
+#[derive(Debug, Clone)]
+enum YIntercept {
+    Number(f64),
+    Unknown,
+}
 
 /*
 * Stats on our cache usage that are returned in a structure.
@@ -53,10 +61,12 @@ impl Cache {
         // range from 0 to 10 inclusive.
         //
         let size = grid_size as usize + 1;
+        let r_squared = grid_size.pow(2);
 
         Cache {
             grid_size: grid_size,
-            data: vec![vec![CacheState::Unknown; size]; size],
+            r_squared: r_squared,
+            data: vec![YIntercept::Unknown; size],
             hits: 0,
             misses: 0,
         }
@@ -65,18 +75,50 @@ impl Cache {
 
 
     /*
-    * Get point from the cache.
+    * Based on the x value and our radius, calculate the y-intercept.
+    * Any y values less than or equal to that are inside the circle.
     */
-    pub fn get(&self, point: Point) -> CacheState {
-        self.data[point.x as usize][point.y as usize]
+    fn get_y_intercept(&self, point: Point) -> f64 {
+        let retval = (self.r_squared as f64 - point.x.pow(2) as f64).sqrt();
+        retval
     }
 
 
     /*
-    * Set a point in our cache.
+    * Return true if the point is in the circle, false otherwise.
     */
-    pub fn set(&mut self, point: Point, value: CacheState) {
-        self.data[point.x as usize][point.y as usize] = value;
+    pub fn get(&mut self, point: Point) -> bool {
+
+        //
+        // If we don't have our y intercept, generate it.
+        //
+        match self.data[point.x as usize] {
+            YIntercept::Unknown => {
+                let y_intercept = self.get_y_intercept(point);
+                self.data[point.x as usize] = YIntercept::Number(y_intercept);
+                self.misses += 1;
+            },
+            _ => {
+                self.hits += 1;
+                }
+        }
+
+        //
+        // Now figure out what to return.
+        //
+        let y_intercept = &self.data[point.x as usize];
+        match y_intercept {
+            YIntercept::Number(y) => {
+                if point.y as f64 <= *y {
+                    return true;
+                } 
+                return false;
+            }
+            _ => {
+                panic!("We should never get here, so there must be a y-intercept issue!");
+                },
+        }
+
     }
 
 
@@ -85,12 +127,12 @@ impl Cache {
     */
     pub fn has(&mut self, point: Point) -> bool {
 
-        match self.data[point.x as usize][point.y as usize] {
-            CacheState::True | CacheState::False => {
+        match self.data[point.x as usize] {
+            YIntercept::Number(_) => {
                 self.hits += 1;
                 true
             },
-            CacheState::Unknown => {
+            YIntercept::Unknown => {
                 self.misses += 1;
                 false
             }
@@ -112,9 +154,19 @@ impl Cache {
     */
     pub fn precompute(&mut self) {
 
+// TEST
+// y = sqrt(r^2 - x^2)
+/*
         let r_squared = self.grid_size.pow(2);
 
         for x in 0..self.data.len() {
+
+        let r_squared = self.grid_size.pow(2);
+//let tmp = self.grid_size.pow(2) as f64 - x.pow(2) as f64;
+let tmp = (self.grid_size.pow(2) as f64 - x.pow(2) as f64).sqrt();
+//let tmp2 = tmp.sqrt();
+println!("TEST: x: {:?}, y-intercept: {:?}", x, tmp);
+
             for y in 0..self.data[x].len() {
                 //
                 // Technically, I am duplicating code from the Points struct, but I feel
@@ -131,6 +183,7 @@ impl Cache {
 
             }
         }
+*/
 
     }
 
