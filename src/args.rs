@@ -39,6 +39,10 @@ pub struct Args {
     pub cache: bool,
 
     #[arg(long, default_value_t = false, 
+        help = "Precompute the contents of the cache for each thread.  Implies --cache.")]
+    pub cache_precompute: bool,
+
+    #[arg(long, default_value_t = false, 
         help = "Benchmark mode.  This will print how many points per second were plotted.")]
     pub benchmark: bool,
 
@@ -55,7 +59,7 @@ pub struct Args {
 
 pub fn parse() -> Args {
 
-    let args = Args::parse();
+    let mut args = Args::parse();
 
     if args.grid_size < 10 {
         panic!("Size must be at least 10!");
@@ -63,6 +67,10 @@ pub fn parse() -> Args {
 
     if args.num_threads > num_cpus::get().try_into().unwrap() {
         panic!("Number of threads cannot exceed number of cores ({})", num_cpus::get());
+    }
+
+    if args.cache_precompute {
+        args.cache = true;
     }
 
     args

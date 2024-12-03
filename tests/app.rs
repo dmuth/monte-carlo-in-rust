@@ -28,7 +28,7 @@ fn test_app() {
     let num_threads = 1;
     let batch_size = 1000;
     let random_seed = Some(12345);
-    let app = App::new(grid_size, num_points, num_threads, batch_size, false, false, random_seed);
+    let app = App::new(grid_size, num_points, num_threads, batch_size, false, false, false, random_seed);
 
     let (pi, metrics) = app.go();
     assert_eq!(pi, 2.908);
@@ -47,16 +47,17 @@ fn test_app_cache() {
     let batch_size = 1000;
     let random_seed = Some(12345);
     let cache = true;
+    let cache_precompute = false;
     let turbo = false;
 
-    let app = App::new(grid_size, num_points, num_threads, batch_size, cache, turbo, random_seed);
+    let app = App::new(grid_size, num_points, num_threads, batch_size, cache, cache_precompute, turbo, random_seed);
     let (pi, metrics) = app.go();
     assert_eq!(pi, 2.908);
     assert_eq!(metrics.cache_hits, 879);
     assert_eq!(metrics.cache_misses, 121);
 
     let num_points = 1001;
-    let app = App::new(grid_size, num_points, num_threads, batch_size, cache, turbo, random_seed);
+    let app = App::new(grid_size, num_points, num_threads, batch_size, cache, cache_precompute, turbo, random_seed);
     let (pi, metrics) = app.go();
     assert_eq!(pi, 2.909090909090909);
     assert_eq!(metrics.cache_hits, 880);
@@ -73,9 +74,10 @@ fn test_app_turbo() {
     let num_threads = 1;
     let batch_size = 1000;
     let cache = false;
+    let cache_precompute = false;
     let turbo = true;
     let random_seed = Some(12345);
-    let app = App::new(grid_size, num_points, num_threads, batch_size, cache, turbo, random_seed);
+    let app = App::new(grid_size, num_points, num_threads, batch_size, cache, cache_precompute, turbo, random_seed);
 
     let (pi, metrics) = app.go();
     assert_eq!(pi, 2.908);
@@ -93,9 +95,10 @@ fn test_app_cache_turbo() {
     let num_threads = 1;
     let batch_size = 1000;
     let cache = true;
+    let cache_precompute = false;
     let turbo = true;
     let random_seed = Some(12345);
-    let app = App::new(grid_size, num_points, num_threads, batch_size, cache, turbo, random_seed);
+    let app = App::new(grid_size, num_points, num_threads, batch_size, cache, cache_precompute, turbo, random_seed);
 
     let (pi, metrics) = app.go();
     assert_eq!(pi, 2.908);
@@ -113,9 +116,10 @@ fn test_app_multithreading() {
     let num_threads = 2;
     let batch_size = 100;
     let cache = false;
+    let cache_precompute = false;
     let turbo = false;
     let random_seed = Some(12345);
-    let app = App::new(grid_size, num_points, num_threads, batch_size, cache, turbo, random_seed);
+    let app = App::new(grid_size, num_points, num_threads, batch_size, cache, cache_precompute, turbo, random_seed);
 
     let (pi, metrics) = app.go();
     assert!(within_tolerance(2.968, pi, 0.1), "Value of pi outside tolerance");
@@ -133,9 +137,10 @@ fn test_app_multithreading_cache() {
     let num_threads = 2;
     let batch_size = 100;
     let cache = true;
+    let cache_precompute = false;
     let turbo = false;
     let random_seed = Some(12345);
-    let app = App::new(grid_size, num_points, num_threads, batch_size, cache, turbo, random_seed);
+    let app = App::new(grid_size, num_points, num_threads, batch_size, cache, cache_precompute, turbo, random_seed);
 
     let (pi, metrics) = app.go();
     assert!(within_tolerance(2.908, pi, 0.1), "Value of pi outside tolerance");
@@ -153,9 +158,10 @@ fn test_app_multithreading_turbo() {
     let num_threads = 2;
     let batch_size = 100;
     let cache = false;
+    let cache_precompute = false;
     let turbo = true;
     let random_seed = Some(12345);
-    let app = App::new(grid_size, num_points, num_threads, batch_size, cache, turbo, random_seed);
+    let app = App::new(grid_size, num_points, num_threads, batch_size, cache, cache_precompute, turbo, random_seed);
 
     let (pi, metrics) = app.go();
     assert!(within_tolerance(2.908, pi, 0.1), "Value of pi outside tolerance");
@@ -173,9 +179,10 @@ fn test_app_multithreading_cache_turbo() {
     let num_threads = 2;
     let batch_size = 100;
     let cache = true;
+    let cache_precompute = false;
     let turbo = true;
     let random_seed = Some(12345);
-    let app = App::new(grid_size, num_points, num_threads, batch_size, cache, turbo, random_seed);
+    let app = App::new(grid_size, num_points, num_threads, batch_size, cache, cache_precompute, turbo, random_seed);
 
     let (pi, metrics) = app.go();
     assert!(within_tolerance(2.908, pi, 0.1), "Value of pi outside tolerance");
@@ -193,18 +200,18 @@ fn test_app_get_batch_count() {
     let num_threads = 1;
     let batch_size = 100;
     let random_seed = Some(12345);
-    let mut app = App::new(grid_size, num_points, num_threads, batch_size, false, false, random_seed);
+    let mut app = App::new(grid_size, num_points, num_threads, batch_size, false, false, false, random_seed);
     assert_eq!(app.get_batch_count(), 100);
     assert_eq!(app.get_batch_count(), 100);
 
     let num_points = 100;
-    let mut app = App::new(grid_size, num_points, num_threads, batch_size, true, false, random_seed);
+    let mut app = App::new(grid_size, num_points, num_threads, batch_size, true, false, false, random_seed);
     assert_eq!(app.get_batch_count(), 100);
     assert_eq!(app.get_batch_count(), 0);
     assert_eq!(app.get_batch_count(), 0);
 
     let num_points = 150;
-    let mut app = App::new(grid_size, num_points, num_threads, batch_size, false, true, random_seed);
+    let mut app = App::new(grid_size, num_points, num_threads, batch_size, false, true, false, random_seed);
     assert_eq!(app.get_batch_count(), 100);
     assert_eq!(app.get_batch_count(), 50);
     assert_eq!(app.get_batch_count(), 0);

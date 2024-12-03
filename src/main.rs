@@ -44,10 +44,12 @@ fn main() {
     let random_seed = args.random_seed;
     let turbo = args.turbo;
     let cache = args.cache;
+    let cache_precompute = args.cache_precompute;
 
     if args.avg_multiple_runs == 0 {
 
-        let app = App::new(grid_size, num_points, num_threads, batch_size, cache, turbo, random_seed);
+        let app = App::new(grid_size, num_points, num_threads, batch_size, 
+            cache, cache_precompute, turbo, random_seed);
 
         let (pi, metrics) = app.go();
 
@@ -91,7 +93,8 @@ fn main() {
         for i in 1..=args.avg_multiple_runs {
             info!("Beginning run {:?}/{:?}", i, args.avg_multiple_runs);
 
-            let app = App::new(grid_size, num_points, num_threads, batch_size, cache, turbo, random_seed);
+            let app = App::new(grid_size, num_points, num_threads, batch_size, 
+                cache, cache_precompute, turbo, random_seed);
             let (pi, _) = app.go();
             values.push(pi);
 

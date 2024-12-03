@@ -31,6 +31,7 @@ pub struct App {
     num_threads: u64,
     batch_size: u64,
     cache: bool,
+    cache_precompute: bool,
     turbo: bool,
     random_seed: Option<u64>,
 }
@@ -55,6 +56,7 @@ impl fmt::Debug for App {
             .field("num_threads", &self.num_threads)
             .field("batch_size", &self.batch_size)
             .field("cache", &self.cache)
+            .field("cache_precompute", &self.cache_precompute)
             .field("turbo", &self.turbo)
             .field("random_seed", &self.random_seed)
             .finish()
@@ -66,7 +68,7 @@ impl fmt::Debug for App {
 impl App {
 
     pub fn new(grid_size: u64, num_points: u64, 
-        num_threads: u64, batch_size: u64, cache: bool, 
+        num_threads: u64, batch_size: u64, cache: bool, cache_precompute: bool,
         turbo: bool, random_seed: Option<u64>) -> Self {
 
         App {
@@ -76,6 +78,7 @@ impl App {
             num_threads: num_threads,
             batch_size: batch_size,
             cache: cache,
+            cache_precompute: cache_precompute,
             turbo: turbo,
             random_seed: random_seed,
             }
@@ -98,6 +101,11 @@ impl App {
         match self.cache {
             true => {
                 cache = Some(Rc::new(RefCell::new(Cache::new(self.grid_size))));
+                if self.cache_precompute {
+                    info!("Precomputing cache...");
+                    cache.as_mut().unwrap().borrow_mut().precompute();
+                    info!("Done precomputing cache!");
+                }
             },
             _ => {}
         }
@@ -161,7 +169,7 @@ impl App {
         receiver: Arc< crossbeam::channel::Receiver<u64> >,
         sender: crossbeam::channel::Sender< ResultMessage >,
         random_seed: Option<u64>, grid_size: u64, 
-        cache_in: bool, turbo: bool
+        cache_in: bool, cache_precompute: bool, turbo: bool
         ) {
 
         let mut rng = Random::new(random_seed);
@@ -170,6 +178,11 @@ impl App {
         match cache_in {
             true => {
                 cache = Some(Rc::new(RefCell::new(Cache::new(grid_size))));
+                if cache_precompute {
+                    info!("Thread {:?}: Precomputing cache...", thread_id);
+                    cache.as_mut().unwrap().borrow_mut().precompute();
+                    info!("Thread {:?}: Done precomputing cache!", thread_id);
+                }
             },
             _ => {}
         }
@@ -233,10 +246,12 @@ impl App {
         let random_seed = self.random_seed;
         let grid_size = self.grid_size;
         let cache = self.cache;
+        let cache_precompute = self.cache_precompute;
         let turbo = self.turbo;
 
         let handle = thread::spawn(move || {
-            Self::thread_spawn_core(thread_id, receiver, sender, random_seed, grid_size, cache, turbo );
+            Self::thread_spawn_core(thread_id, receiver, sender, random_seed, grid_size, 
+                cache, cache_precompute, turbo );
         });
 
         handle
