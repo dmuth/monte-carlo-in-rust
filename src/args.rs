@@ -11,18 +11,19 @@ use num_cpus;
 #[command(about = "Calculate Pi using a Monte Carlo simulation.", long_about = None)]
 pub struct Args {
 
-    #[arg(short, long, default_value_t = 10, help = "The Size of the grid.")]
+    #[arg(short, long, default_value_t = 10, value_name = "num_points", help = "The Size of the grid.")]
     pub grid_size: u64,
 
-    #[arg(short, long, default_value_t = 100, 
+    #[arg(short, long, default_value_t = 100, value_name = "count",
         help = "How many random numbers do we want to generate in total?")]
     pub count: u64,
 
-    #[arg(short, long, default_value_t = 100, 
+    #[arg(short, long, default_value_t = 100, value_name = "size",
         help = "How many random numbers to generate per function invocation?")]
     pub batch_size: u64,
 
-    #[arg(short, long, default_value_t = 1, help = "How many threads to use for computation?")]
+    #[arg(short, long, default_value_t = 1, value_name = "n",
+        help = "How many threads to use for computation?")]
     pub num_threads: u64,
 
     #[arg(short, long, default_value_t = false,
@@ -30,7 +31,7 @@ pub struct Args {
     pub metrics: bool,
 
     #[arg(short, long, default_value_t = false, 
-        help = "Set to use \"turbo\" mode where a simplified version of the Pythaogrean Theorem is used.")]
+        help = "Set to use \"turbo\" mode where a simplified version of the Pythagorean Theorem is used.")]
     pub turbo: bool,
 
     #[arg(long, default_value_t = false, 
@@ -41,11 +42,12 @@ pub struct Args {
         help = "Benchmark mode.  This will print how many points per second were plotted.")]
     pub benchmark: bool,
 
-    #[arg(short, long, default_value_t = 0,
+    #[arg(short, long, default_value_t = 0, value_name = "n",
         help = "Perform multiple runs and average the values of Pi from all runs.")]
     pub avg_multiple_runs: u64,
 
-    #[arg(short, long, help = "ADVANCED: Seed the random number generator for deterministic behavior.")]
+    #[arg(short, long, value_name = "seed",
+        help = "ADVANCED: Seed the random number generator for deterministic behavior.")]
     pub random_seed: Option<u64>,
 
 }

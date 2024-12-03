@@ -25,6 +25,25 @@ if it is in the circle (using the Pythagorean Theorem), and at the end the numbe
 in the circle are divided into the total number of points and multiplied by four.  This gives
 us an approximation of Pi.
 
+
+## CLI Args
+
+The absolute most up to date args can be found by running `monte_carlo -h`, but here's 
+a brief introduction to command line options:
+
+- `-g, --grid-size` - How big to make each axis of the grid?  Bigger sizes will yield more precise numbers for Pi.
+- `-c, --count` - How many random points to generate in total?
+- `-b, --batch-size` - How many random points per loop in each thread?
+- `-n, --num-threads` - How many threads to use for random point generation?
+- `-m, --metrics` - Set if you want metrics printed out in JSON format.
+- `-t, --turbo` - Use "turbo" mode where a simplfied version of the Pythagorean Theorem is used.
+- `--cache` - Set to use caching for "is this point inside the circle?" calculations.
+- `--benchmark` - Benchmark mode.  This will print how many points per second were plotted.
+- `-a, --avg-multiple-runs` - Perform multiple runs and average the values of Pi from all runs.
+- `-r, --random-seed` - ADVANCED: Seed the random number generator with a value for deterministic behavior.
+  - This is only effective when used in a single thread.  Multiple threads are NOT deterministic because each thread gets its own RNG 
+
+
 ## Architecture
 
 - App - Top level module/struct, that drives everything.  It spawns threads and performs calculations in threads.
@@ -46,6 +65,5 @@ us an approximation of Pi.
   - `--nocapture` lets me use `println!()` and similar to write to stdout
 - Build for prod
   - `cargo build --release`
-
 
 
