@@ -126,13 +126,8 @@ impl Points {
             //
             match self.cache {
                 Some(ref mut cache) => {
-                    if cache.borrow_mut().has(*point) {
-                        match cache.borrow_mut().get(*point) {
-                            true => {
-                                num_points += 1;
-                            },
-                            _ => {},
-                        }
+                    if cache.borrow_mut().get(*point) {
+                        num_points += 1;
                         continue;
                     }
                 },
@@ -146,14 +141,6 @@ impl Points {
 
             if in_circle {
                 num_points += 1;
-// TESt
-//                if let Some(ref mut cache) = self.cache {
-//                    cache.borrow_mut().set(*point, CacheState::True);
-//                }
-            } else {
-//                if let Some(ref mut cache) = self.cache {
-//                    cache.borrow_mut().set(*point, CacheState::False);
-//                }
             }
 
         }

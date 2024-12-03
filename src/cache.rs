@@ -13,7 +13,7 @@ use crate::point::Point;
 pub struct Cache {
     pub grid_size: u64,
     r_squared: u64,
-    data: Vec<YIntercept>,
+    data: Vec<YArc>,
     hits: u64,
     misses: u64,
 }
@@ -29,10 +29,10 @@ pub enum CacheState {
 }
 
 /*
-* Y-intercept values.
+* Y-arc values.
 */
 #[derive(Debug, Clone)]
-enum YIntercept {
+enum YArc {
     Number(f64),
     Unknown,
 }
@@ -66,7 +66,7 @@ impl Cache {
         Cache {
             grid_size: grid_size,
             r_squared: r_squared,
-            data: vec![YIntercept::Unknown; size],
+            data: vec![YArc::Unknown; size],
             hits: 0,
             misses: 0,
         }
@@ -75,27 +75,32 @@ impl Cache {
 
 
     /*
-    * Based on the x value and our radius, calculate the y-intercept.
+    * Based on the x value and our radius, calculate the y-arc.
     * Any y values less than or equal to that are inside the circle.
     */
-    fn get_y_intercept(&self, point: Point) -> f64 {
-        let retval = (self.r_squared as f64 - point.x.pow(2) as f64).sqrt();
+    fn get_y_arc(&self, x: u64) -> f64 {
+        let retval = (self.r_squared as f64 - x.pow(2) as f64).sqrt();
         retval
     }
 
 
     /*
     * Return true if the point is in the circle, false otherwise.
+    *
+    * NOTE: This strays a little from the original intent, which was to return
+    * a cached value.  This is because the cache functionality changed a bit--it started
+    * off as a 2 dimensional array of all possible points, but I quickly ran into
+    * scaling issues.
     */
     pub fn get(&mut self, point: Point) -> bool {
 
         //
-        // If we don't have our y intercept, generate it.
+        // If we don't have our y arc in our cache, generate it.
         //
         match self.data[point.x as usize] {
-            YIntercept::Unknown => {
-                let y_intercept = self.get_y_intercept(point);
-                self.data[point.x as usize] = YIntercept::Number(y_intercept);
+            YArc::Unknown => {
+                let y_arc = self.get_y_arc(point.x);
+                self.data[point.x as usize] = YArc::Number(y_arc);
                 self.misses += 1;
             },
             _ => {
@@ -106,16 +111,16 @@ impl Cache {
         //
         // Now figure out what to return.
         //
-        let y_intercept = &self.data[point.x as usize];
-        match y_intercept {
-            YIntercept::Number(y) => {
+        let y_arc = &self.data[point.x as usize];
+        match y_arc {
+            YArc::Number(y) => {
                 if point.y as f64 <= *y {
                     return true;
                 } 
                 return false;
             }
             _ => {
-                panic!("We should never get here, so there must be a y-intercept issue!");
+                panic!("We should never get here, so there must be a y-arc issue!");
                 },
         }
 
@@ -128,11 +133,11 @@ impl Cache {
     pub fn has(&mut self, point: Point) -> bool {
 
         match self.data[point.x as usize] {
-            YIntercept::Number(_) => {
+            YArc::Number(_) => {
                 self.hits += 1;
                 true
             },
-            YIntercept::Unknown => {
+            YArc::Unknown => {
                 self.misses += 1;
                 false
             }
@@ -150,40 +155,14 @@ impl Cache {
 
 
     /*
-    * Pre-compute all values in our cache.
+    * Pre-compute all y-arc values in our cache.
     */
     pub fn precompute(&mut self) {
 
-// TEST
-// y = sqrt(r^2 - x^2)
-/*
-        let r_squared = self.grid_size.pow(2);
-
         for x in 0..self.data.len() {
-
-        let r_squared = self.grid_size.pow(2);
-//let tmp = self.grid_size.pow(2) as f64 - x.pow(2) as f64;
-let tmp = (self.grid_size.pow(2) as f64 - x.pow(2) as f64).sqrt();
-//let tmp2 = tmp.sqrt();
-println!("TEST: x: {:?}, y-intercept: {:?}", x, tmp);
-
-            for y in 0..self.data[x].len() {
-                //
-                // Technically, I am duplicating code from the Points struct, but I feel
-                // this made more sense than splitting that out into a separate function that 
-                // would be called statically from this one.
-                //
-                let mut val = CacheState::False;
-                let total = x.pow(2) as u64 + y.pow(2) as u64;
-                if total <= r_squared {
-                    val = CacheState::True;
-                }
-
-                self.data[x][y] = val;
-
-            }
+            let y_arc = self.get_y_arc(x as u64);
+            self.data[x] = YArc::Number(y_arc);
         }
-*/
 
     }
 

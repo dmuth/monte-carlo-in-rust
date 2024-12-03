@@ -74,18 +74,18 @@ fn test_cache_precompute() {
     assert_eq!(cache.borrow_mut().has(point), true);
 
     let stats = cache.borrow().get_stats();
-    assert_eq!( (stats.hits, stats.misses), (1, 0));
+    assert_eq!( (stats.hits, stats.misses), (2, 0));
 
     let point = Point{x:3, y:4};
     assert_eq!(cache.borrow_mut().get(point), true);
     assert_eq!(cache.borrow_mut().has(point), true);
 
     let point = Point{x:grid_size, y:grid_size};
-    assert_eq!(cache.borrow_mut().get(point), true);
+    assert_eq!(cache.borrow_mut().get(point), false);
     assert_eq!(cache.borrow_mut().has(point), true);
 
     let stats = cache.borrow().get_stats();
-    assert_eq!( (stats.hits, stats.misses), (3, 0));
+    assert_eq!( (stats.hits, stats.misses), (6, 0));
 
     let grid_size = 10;
     let cache = Rc::new(RefCell::new(Cache::new(grid_size)));

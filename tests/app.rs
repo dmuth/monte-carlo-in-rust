@@ -53,15 +53,15 @@ fn test_app_cache() {
     let app = App::new(grid_size, num_points, num_threads, batch_size, cache, cache_precompute, turbo, random_seed);
     let (pi, metrics) = app.go();
     assert_eq!(pi, 2.908);
-    assert_eq!(metrics.cache_hits, 879);
-    assert_eq!(metrics.cache_misses, 121);
+    assert_eq!(metrics.cache_hits, 989);
+    assert_eq!(metrics.cache_misses, 11);
 
     let num_points = 1001;
     let app = App::new(grid_size, num_points, num_threads, batch_size, cache, cache_precompute, turbo, random_seed);
     let (pi, metrics) = app.go();
     assert_eq!(pi, 2.909090909090909);
-    assert_eq!(metrics.cache_hits, 880);
-    assert_eq!(metrics.cache_misses, 121);
+    assert_eq!(metrics.cache_hits, 990);
+    assert_eq!(metrics.cache_misses, 11);
 
 }
 
@@ -102,8 +102,8 @@ fn test_app_cache_turbo() {
 
     let (pi, metrics) = app.go();
     assert_eq!(pi, 2.908);
-    assert_eq!(metrics.cache_hits, 9879);
-    assert_eq!(metrics.cache_misses, 121);
+    assert_eq!(metrics.cache_hits, 9989);
+    assert_eq!(metrics.cache_misses, 11);
 
 }
 
@@ -144,8 +144,8 @@ fn test_app_multithreading_cache() {
 
     let (pi, metrics) = app.go();
     assert!(within_tolerance(2.908, pi, 0.1), "Value of pi outside tolerance");
-    assert!(within_tolerance(metrics.cache_hits, 758, 20));
-    assert!(within_tolerance(metrics.cache_misses, 242, 20));
+    assert!(within_tolerance(metrics.cache_hits, 978, 20));
+    assert!(within_tolerance(metrics.cache_misses, 22, 20));
 
 }
 
@@ -186,8 +186,8 @@ fn test_app_multithreading_cache_turbo() {
 
     let (pi, metrics) = app.go();
     assert!(within_tolerance(2.908, pi, 0.1), "Value of pi outside tolerance");
-    assert!(within_tolerance(metrics.cache_hits, 758, 20));
-    assert!(within_tolerance(metrics.cache_misses, 242, 20));
+    assert!(within_tolerance(metrics.cache_hits, 978, 20));
+    assert!(within_tolerance(metrics.cache_misses, 22, 20));
 
 }
 
