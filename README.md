@@ -6,6 +6,8 @@ features.  So I figured a good way to do that would be to try and compute the va
 using the Monte Carlo method as fast as possible.  I chose this method because it didn't require
 me to find hosting or use external data sources.
 
+If you want to see how this code performs in benchmarking [look over here](benchmarks.md)!
+
 
 ## How it works
 
