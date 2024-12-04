@@ -40,6 +40,7 @@ a brief introduction to command line options:
 - `-m, --metrics` - Set if you want metrics printed out in JSON format.
 - `-t, --turbo` - Use "turbo" mode where a simplfied version of the Pythagorean Theorem is used.
 - `--cache` - Set to use caching for "is this point inside the circle?" calculations.
+- `--cache-precompute` - Precompute the entire cache.  Implies `--cache`.
 - `--benchmark` - Benchmark mode.  This will print how many points per second were plotted.
 - `-a, --avg-multiple-runs` - Perform multiple runs and average the values of Pi from all runs.
 - `-r, --random-seed` - ADVANCED: Seed the random number generator with a value for deterministic behavior.
