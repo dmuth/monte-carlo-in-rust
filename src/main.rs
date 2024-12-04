@@ -15,7 +15,6 @@ mod args;
 mod app;
 mod cache;
 mod grid;
-mod metric;
 mod metrics;
 mod point;
 mod points;
