@@ -8,6 +8,8 @@ set -e
 
 BINARY="target/debug/monte_carlo"
 
+OUTPUT="benchmarks-raw.md"
+
 COUNT=1000000
 BATCH_SIZE=1000
 GRID_SIZE=1000000
@@ -31,63 +33,96 @@ function benchmark() {
 }
 
 
+#
+# Append our most recent benchmark to the output file.
+#
+function update_output {
+
+    echo "" >> ${OUTPUT}
+    echo $OUTPUT_FILE >> ${OUTPUT}
+    cat benchmarks/$OUTPUT_FILE >> ${OUTPUT}
+
+}
+
 echo "# Cleaning up any old benchmark outputs..."
 pushd benchmarks > /dev/null
 rm -fv *.md
 popd > /dev/null
+rm -fv ${OUTPUT}
 
 echo "# Testing dev build..."
 OUTPUT_FILE="dev.md"
 benchmark
+update_output
 
-echo "# Testing prod build..."
+echo "# Testing release build..."
 BINARY="target/release/monte_carlo"
-OUTPUT_FILE="prod.md"
+OUTPUT_FILE="release.md"
 benchmark
+update_output
 
-echo "# Now testing prod with 10 million points..."
+echo "# Now testing release build with 10 million points..."
 COUNT=10000000
 OUTPUT_FILE="10-million-points.md"
 benchmark
+update_output
 
 BATCH_SIZE=10000
-echo "# Now testing prod with batch size of ${BATCH_SIZE}"
+echo "# Now testing release build with batch size of ${BATCH_SIZE}"
 OUTPUT_FILE="batch-size-10000.md"
 benchmark
+update_output
 
 BATCH_SIZE=100000
-echo "# Now testing prod with batch size of ${BATCH_SIZE}"
+echo "# Now testing release build with batch size of ${BATCH_SIZE}"
 OUTPUT_FILE="batch-size-100000.md"
 benchmark
+update_output
 
 BATCH_SIZE=10000
-echo "# Now testing prod with batch size of ${BATCH_SIZE} and turbo mode"
+echo "# Now testing release build with batch size of ${BATCH_SIZE} and turbo mode"
 OUTPUT_FILE="turbo.md"
 benchmark --turbo
+update_output
 
-echo "# Now testing prod with batch size of ${BATCH_SIZE} and cache mode"
+echo "# Now testing release build with batch size of ${BATCH_SIZE} and cache mode"
 OUTPUT_FILE="cache.md"
 benchmark --cache
+update_output
 
-echo "# Now testing prod with batch size of ${BATCH_SIZE} and cache mode with pre-compute"
+echo "# Now testing release build with batch size of ${BATCH_SIZE} and cache mode with pre-compute"
 OUTPUT_FILE="cache-precompute.md"
 benchmark --cache-precompute
+update_output
 
-GRID_SIZE=1000000
-echo "# Now testing prod with batch size of ${BATCH_SIZE}, grid size of ${GRID_SIZE}, and cache mode with pre-compute"
-OUTPUT_FILE="cache-precompute-grid-size-${GRID_SIZE}.md"
+GRID_SIZE=100000000
+echo "# Now testing release build with grid size of ${GRID_SIZE}, and cache mode with pre-compute"
+OUTPUT_FILE="grid-size-${GRID_SIZE}.md"
 benchmark 
+update_output
 
-RAW="benchmarks-raw.md"
-echo "# Writing all benchmarks to ${RAW}..."
-touch ${RAW}
-for FILE in benchmarks/*
-do
-    echo ${FILE} >> ${RAW}
-    cat ${FILE} >> ${RAW}
-    echo >> ${RAW}
-done
+echo "# Now testing release build with grid size of ${GRID_SIZE}, and cache mode with pre-compute"
+OUTPUT_FILE="grid-size-${GRID_SIZE}-cache.md"
+benchmark --cache
+update_output
 
-echo "# Done!"
+echo "# Now testing release build with grid size of ${GRID_SIZE}, and cache mode with pre-compute"
+OUTPUT_FILE="grid-size-${GRID_SIZE}-cache-precompute.md"
+benchmark  --cache-precompute
+update_output
+
+GRID_SIZE=1000000000
+echo "# Now testing release build with grid size of ${GRID_SIZE}"
+OUTPUT_FILE="grid-size-${GRID_SIZE}.md"
+benchmark 
+update_output
+
+COUNT=100000000
+echo "# Now testing release build with grid size of ${GRID_SIZE}, and count of ${COUNT}"
+OUTPUT_FILE="grid-size-${GRID_SIZE}-count-${COUNT}.md"
+benchmark 
+update_output
+
+echo "# Done! (Benchmarks all in ${OUTPOUT_FILE})"
 
 
