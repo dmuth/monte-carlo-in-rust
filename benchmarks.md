@@ -9,6 +9,8 @@ These tests were done on my October 2020 iMac with a 3.6 GHz 10-Core Intel Core 
 The column to pay attention to is "relative", where 1.00 represents the best run.  I will also have that line **bolded**.
 
 
+## The Tests
+
 First, the development binary, 1 million points on a 1 million x 1 million grid:
 
 | Command | Mean [ms] | Min [ms] | Max [ms] | Relative |
