@@ -2,7 +2,9 @@
 # Monte Carlo Benchmarks for Calculating Pi in Rust
 
 I used [Hyperfine](https://github.com/sharkdp/hyperfine) to run a bunch of benchmarks
-on this app, and I wanted to share what I learned.
+on [my Monte Carlo Pi simulation in Rust](README.md), and I wanted to share what I learned.
+
+These tests were done on my October 2020 iMac with a 3.6 GHz 10-Core Intel Core i9 processor and 32 GB of RAM.
 
 The column to pay attention to is "relative", where 1.00 represents the best run.  
 I will also have that line bolded.
