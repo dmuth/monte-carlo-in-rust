@@ -9,6 +9,7 @@
 #[derive(Debug)]
 pub struct Grid {
     // The size of each side, in points.
+    #[allow(dead_code)] 
     size: u64,
     num_points_in_circle: u64,
     num_points_not_in_circle: u64,
@@ -25,6 +26,7 @@ impl Grid {
         }
     }
 
+    #[allow(dead_code)] 
     pub fn get_num_points_in_circle(&self) -> u64 {
         self.num_points_in_circle
     }
@@ -33,6 +35,7 @@ impl Grid {
         self.num_points_in_circle += num;
     }
 
+    #[allow(dead_code)] 
     pub fn get_num_points_not_in_circle(&self) -> u64 {
         self.num_points_not_in_circle
     }

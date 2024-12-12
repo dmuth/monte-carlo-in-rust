@@ -62,6 +62,7 @@ impl Points {
     * This version of the constructor is used when we want to manually insert
     * pre-generated points for testing purposes.
     */
+    #[allow(dead_code)] 
     pub fn new_with_points(grid_size: u64, points: Vec::<Point>, 
         cache: Option<Rc<RefCell<Cache>>>) -> Self {
 
@@ -77,6 +78,7 @@ impl Points {
     /*
     * Return our points for diagnostic purposes.
     */
+    #[allow(dead_code)] 
     pub fn get_points(self: Points) -> Vec<Point> {
         self.points
     }
@@ -165,6 +167,7 @@ impl Points {
     /*
     * Get stats from the cache
     */
+    #[allow(dead_code)] 
     fn get_cache_stats(self: Points) -> CacheStats {
 
         match &self.cache {

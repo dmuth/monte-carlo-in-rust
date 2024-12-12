@@ -11,6 +11,7 @@ use crate::point::Point;
 */
 #[derive(Debug)]
 pub struct Cache {
+    #[allow(dead_code)] 
     pub grid_size: u64,
     r_squared: u64,
     data: Vec<YArc>,
@@ -23,6 +24,7 @@ pub struct Cache {
 * Possible states for values in our cache.
 */
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[allow(dead_code)] 
 pub enum CacheState {
     True,
     False,
@@ -130,6 +132,7 @@ impl Cache {
     /*
     * Return true if the point has been set, or false otherwise.
     */
+    #[allow(dead_code)] 
     pub fn has(&mut self, point: Point) -> bool {
 
         match self.data[point.x as usize] {

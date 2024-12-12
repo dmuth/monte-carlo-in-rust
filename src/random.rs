@@ -35,6 +35,7 @@ impl Random {
     /*
     * Return a randon number in our range.
     */
+    #[allow(dead_code)] 
     pub fn get(&mut self, lower: u64, upper: u64) -> u64 {
         self.rng.gen_range(lower..=upper)
     }
